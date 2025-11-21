@@ -1,0 +1,286 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>UsuariosIndex</title>
+    <th:block layout:fragment="extra-css">
+        <style>
+            body {
+                background: #f5f7ff;
+                min-height: 100vh;
+                padding: 5px 0;
+            }
+
+            .main-card {
+                background: #D7D4D4;
+                border-radius: 18px;
+                box-shadow: 0 5px 18px rgba(0, 0, 0, 0.1);
+                padding: 0;
+                max-width: 1100px;
+                margin: auto;
+                overflow: hidden;
+            }
+
+            .card-header {
+                background: linear-gradient(90deg, #8FA3BD, #5c6bc0);
+                color: white;
+                padding: 25px;
+                text-align: center;
+            }
+
+            .card-header h2 {
+                font-weight: 600;
+                margin-bottom: 5px;
+            }
+
+            .card-header p {
+                font-size: 0.9rem;
+                opacity: 0.9;
+            }
+
+            .search-bar {
+                background-color: #f8f9ff;
+                padding: 20px;
+                border-bottom: 1px solid #e1e5f2;
+            }
+
+            .search-bar input, .search-bar select {
+                border-radius: 10px;
+            }
+
+            table {
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            thead {
+                background-color: #eef3ff;
+                color: #003366;
+            }
+
+            tbody tr:hover {
+                background-color: #f7f9ff;
+            }
+
+            .btn-info {
+                background-color: #0096c7;
+                border: none;
+            }
+
+            .btn-info:hover {
+                background-color: #0077b6;
+            }
+
+            .btn-danger {
+                background-color: #e63946;
+                border: none;
+            }
+
+            .btn-danger:hover {
+                background-color: #d62828;
+            }
+
+            .status {
+                display: inline-flex;
+                align-items: center;
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                color: white;
+            }
+
+            .activo {
+                background-color: #28a745;
+            }
+
+            .inactivo {
+                background-color: #dc3545;
+            }
+
+            .avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 8px;
+            }
+
+            td {
+                vertical-align: middle;
+            }
+
+            .direccion-item {
+                padding: 5px 0;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .direccion-item:last-child {
+                border-bottom: none;
+            }
+
+            .badge-direccion {
+                background-color: #e3f2fd;
+                color: #1976d2;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+        </style>
+    </th:block>
+</head>
+<body layout:fragment="content">
+    <div class="main-card">
+        <div class="card-header">
+            <h2><i class="bi bi-people-fill me-2"></i>Usuarios</h2>
+            <p>Listado general de usuarios registrados.</p>
+        </div>
+        <div class="search-bar">
+            <form th:action="@{/usuario}" th:object="${usuarioBusqueda}" method="post" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small">Nombre</label>
+                    <input type="text" th:field="*{nombre}" class="form-control" placeholder="Buscar por nombre">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Apellido Paterno</label>
+                    <input type="text" th:field="*{apellidoPaterno}" class="form-control" placeholder="Ap. Paterno">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Apellido Materno</label>
+                    <input type="text" th:field="*{apellidoMaterno}" class="form-control" placeholder="Ap. Materno">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Rol</label>
+                    <select th:field="*{rol.idRol}" class="form-control">
+                        <option value="0">Todos</option>
+                        <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombreRol}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-start">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+                <div class="col-md-1 text-start">
+                    <a th:href="@{/usuario}" class="btn btn-secondary w-100" title="Limpiar búsqueda">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </form>
+            <div class="row mt-3">
+                <div class="col text-center">
+                    <button type="button" class="btn btn-primary" onclick="window.location.href = '/usuario/add'">
+                        <i class="bi bi-person-plus-fill"></i> Agregar Nuevo Usuario
+                    </button>
+                </div>
+                <div class="col text-center">
+                    <button type="button" class="btn btn-dark" onclick="window.location.href = '/usuario/cargaMasiva'">
+                        <i class="bi bi-upload"></i> Cargas Masivas
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="p-3" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-hover align-middle text-center mt-2">
+                <thead>
+                    <tr>
+                        <th>Acciones</th>
+                        <th>Usuario</th>
+                        <th>Datos de contacto</th>
+                        <th>Direcciones</th>                       
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="usuario: ${usuarios}">
+                        <td>
+                            <button class="btn btn-sm btn-info text-white mb-1" 
+                                    th:onclick="'window.location.href=\'/usuario/detalle/' + ${usuario.idUsuario} + '\''">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </td>
+                        <td class="text-start">
+                            <div class="d-flex align-items-center">
+                                <img th:if="${usuario.imagen != null && !usuario.imagen.isEmpty()}" 
+                                     th:src="'data:image/png;base64,' + ${usuario.imagen}" 
+                                     class="avatar" 
+                                     alt="Foto de perfil">
+                                <img th:if="${usuario.imagen == null || usuario.imagen.isEmpty()}" 
+                                     src="https://via.placeholder.com/40" 
+                                     class="avatar" 
+                                     alt="Sin foto">
+                                <div>
+                                    <strong th:text="${usuario.nombre} + ' ' + ${usuario.apellidoPaterno} + ' ' + ${usuario.apellidoMaterno}">Nombre Usuario</strong><br>
+                                    <small class="text-muted" th:text="'@' + ${usuario.userName}">@username</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-start">
+                            <div><i class="bi bi-envelope me-1 text-primary"></i><span th:text="${usuario.email}">email@ejemplo.com</span></div>
+                            <div><i class="bi bi-telephone me-1 text-success"></i><span th:text="${usuario.telefono}">-</span></div>
+                            <div><i class="bi bi-phone me-1 text-info"></i><span th:text="${usuario.celular}">-</span></div>
+                        </td>
+                        <td class="text-start">
+                            <!-- Verificar si hay direcciones -->
+                            <div th:if="${usuario.direcciones != null && !usuario.direcciones.isEmpty()}">
+                                <div th:each="direccion, iterStat : ${usuario.direcciones}" class="direccion-item">
+                                    <span class="badge-direccion" th:text="'Dir. ' + ${iterStat.count}">Dir. 1</span>
+                                    <div class="mt-1">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        <small>
+                                            <strong th:text="${direccion.calle} + ' #' + ${direccion.numeroExterior}">Calle y número</strong>
+                                            <span th:if="${direccion.numeroInterior != null && !direccion.numeroInterior.isEmpty()}" 
+                                                  th:text="' Int. ' + ${direccion.numeroInterior}"></span>
+                                        </small>
+                                    </div>
+                                    <!-- Mostrar colonia y código postal -->
+                                    <div th:if="${direccion.colonia != null}">
+                                        <small class="text-muted">
+                                            <i class="bi bi-house-door me-1"></i>
+                                            <span th:text="${direccion.colonia.nombre}">Colonia</span>
+                                            <span th:if="${direccion.colonia.codigoPostal != null}" 
+                                                  th:text="', CP: ' + ${direccion.colonia.codigoPostal}"></span>
+                                        </small>
+                                    </div>
+                                    <!-- Mostrar municipio, estado y país -->
+                                    <div th:if="${direccion.colonia != null && direccion.colonia.municipio != null}">
+                                        <small class="text-muted">
+                                            <i class="bi bi-map me-1"></i>
+                                            <span th:text="${direccion.colonia.municipio.nombre}">Municipio</span>
+                                            <span th:if="${direccion.colonia.municipio.estado != null}" 
+                                                  th:text="', ' + ${direccion.colonia.municipio.estado.nombre}"></span>
+                                            <span th:if="${direccion.colonia.municipio.estado != null && direccion.colonia.municipio.estado.pais != null}" 
+                                                  th:text="', ' + ${direccion.colonia.municipio.estado.pais.nombre}"></span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Mensaje si no hay direcciones -->
+                            <div th:if="${usuario.direcciones == null || usuario.direcciones.isEmpty()}" class="text-muted">
+                                <i class="bi bi-x-circle me-1"></i>
+                                <small>Sin direcciones registradas</small>
+                            </div>
+                        </td>                        
+                    </tr> 
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<th:block layout:fragment="extra-scripts">
+    <script th:if="${successMessage}" th:inline="javascript">
+        Swal.fire({
+            title: [[${successMessage}]],
+            icon: "success",
+            draggable: true
+        });
+    </script>
+</th:block>
+
+</body>
+</html>
