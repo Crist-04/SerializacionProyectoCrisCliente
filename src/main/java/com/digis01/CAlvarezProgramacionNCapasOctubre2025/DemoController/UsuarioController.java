@@ -25,6 +25,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.stereotype.Controller;
 
@@ -39,6 +43,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -46,14 +51,26 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("usuario")
 public class UsuarioController {
 
-//    @GetMapping
-//    public String UsuarioIndex(Model model) {
-//        Result result = usuarioDAOImplementation.GetAll();
-//        model.addAttribute("usuarios", result.objects);
-//        return "UsuarioIndex";
-//    }
+    public static final String urlBase = "http://localhost:8080";
+
     @GetMapping
     public String UsuarioIndex(Model model) {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange(
+                urlBase + "/api/usuario",
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result<List<Usuario>>>() {
+        }
+        );
+
+        if (responseEntity.getStatusCode().value() == 200) {
+            Result result = responseEntity.getBody();
+            model.addAttribute("usuarios", result.object);
+
+        } else {
+            return "Error";
+        }
 
         return "UsuarioIndex";
     }

@@ -1,11 +1,22 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Direccion {
+    @JsonProperty("IdDireccion")
     private int idDireccion;
+
+    @JsonProperty("Calle")
     private String calle;
+
+    @JsonProperty("NumeroInterior")
     private String numeroInterior;
+
+    @JsonProperty("NumeroExterior")
     private String numeroExterior;
-    public Colonia Colonia; // Relación con Colonia
+
+    @JsonProperty("Colonia")
+    private Colonia Colonia;
     
     // Constructor vacío
     public Direccion() {

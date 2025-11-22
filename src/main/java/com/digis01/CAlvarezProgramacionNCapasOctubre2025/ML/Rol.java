@@ -1,30 +1,35 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Rol {
-    private int IdRol;
-    private String NombreRol;
+    
+    @JsonProperty("idRol")
+    private int idRol;
+    
+    @JsonProperty("nombre")
+    private String nombre;
     
     public Rol() {
     }
     
-    public Rol(int IdRol, String NombreRol) {
-        this.IdRol = IdRol;
-        this.NombreRol = NombreRol;
+    public Rol(int idRol, String nombre) {
+        this.idRol = idRol;
+        this.nombre = nombre;
     }
     
     public int getIdRol() {
-        return IdRol;
+        return idRol;
     }
     
-    public void setIdRol(int IdRol) {
-        this.IdRol = IdRol;
+    public void setIdRol(int idRol) {
+        this.idRol = idRol;
     }
     
-    public String getNombreRol() {
-        return NombreRol;
+    public String getNombre() {
+        return nombre;
     }
     
-    public void setNombreRol(String NombreRol) {
-        this.NombreRol = NombreRol;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 }

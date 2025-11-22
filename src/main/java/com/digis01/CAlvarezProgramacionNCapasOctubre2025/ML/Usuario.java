@@ -1,5 +1,6 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,67 +14,87 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 public class Usuario {
 
+    @JsonProperty("IdUsuario")
     private int idUsuario;
     //"^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(\\s[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)*$"
-    @NotNull(message = "El nombre no puede ser nulo ")
-    @NotEmpty(message = "El nombre no puede estar vacio")
-    @NotBlank(message = "Tampoco puedes dejar espacios ")
-    @Size(min = 2, max = 17, message = "entre 2 y 17 caracteres")
+//    @NotNull(message = "El nombre no puede ser nulo ")
+//    @NotEmpty(message = "El nombre no puede estar vacio")
+//    @NotBlank(message = "Tampoco puedes dejar espacios ")
+//    @Size(min = 2, max = 17, message = "entre 2 y 17 caracteres")
+    @JsonProperty("Nombre")
     private String nombre;
 
-    @NotNull(message = "El apellido paterno No puede ser nulo bro")
-    @NotEmpty(message = "El apellido paterno no puede estar vacio")
-    @NotBlank(message = "Tampoco puedes dejar espacios ")
-    @Size(min = 2, max = 17, message = "entre 2 y 17 caracteres")
+//    @NotNull(message = "El apellido paterno No puede ser nulo bro")
+//    @NotEmpty(message = "El apellido paterno no puede estar vacio")
+//    @NotBlank(message = "Tampoco puedes dejar espacios ")
+//    @Size(min = 2, max = 17, message = "entre 2 y 17 caracteres")
+    @JsonProperty("ApellidoPaterno")
     private String apellidoPaterno;
 
-    @NotNull(message = "El apellido materno No puede ser nulo bro")
-    @NotEmpty(message = "El apellido materno no puede estar vacio")
-    @NotBlank(message = "Tampoco puedes dejar espacios ")
-    @Size(min = 2, max = 17, message = "entre 2 y 17 caracteres")
+//    @NotNull(message = "El apellido materno No puede ser nulo bro")
+//    @NotEmpty(message = "El apellido materno no puede estar vacio")
+//    @NotBlank(message = "Tampoco puedes dejar espacios ")
+//    @Size(min = 2, max = 17, message = "entre 2 y 17 caracteres")
+    @JsonProperty("ApellidoMaterno")
     private String apellidoMaterno;
 
-    @NotBlank(message = "El username no puede estar vacío")
-    @Size(min = 3, max = 8, message = "El username debe tener entre 3 y 20 caracteres")
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[_-])[a-zA-Z0-9_-]+$", message = "El username debe contener al menos: 1 letra, 1 número y 1 guion (3-20 caracteres)")
+//    @NotBlank(message = "El username no puede estar vacío")
+//    @Size(min = 3, max = 8, message = "El username debe tener entre 3 y 20 caracteres")
+//    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[_-])[a-zA-Z0-9_-]+$", message = "El username debe contener al menos: 1 letra, 1 número y 1 guion (3-20 caracteres)")
+    @JsonProperty("UserName")
     private String userName;
 
-    @NotNull(message = "El correo no debe ser nulo")
-    @NotBlank(message = "El correo no puede estar vacío")
-    @Email(message = "El formato del correo no esta bien")
+    //@NotNull(message = "El correo no debe ser nulo")
+    //@NotBlank(message = "El correo no puede estar vacío")
+    //@Email(message = "El formato del correo no esta bien")
+    @JsonProperty("Email")
     private String Email;
 
-    @NotBlank(message = "La contraseña no puede estar vacía")
-    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).*$", message = "Debe tener al menos una mayúscula, 1 número, 1 carácter especial")
+    //@NotBlank(message = "La contraseña no puede estar vacía")
+    //@Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    // @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).*$", message = "Debe tener al menos una mayúscula, 1 número, 1 carácter especial")
+    @JsonProperty("Password")
     private String Password;
 
-    @NotNull(message = "el celular no debe ser nulo")
-    @NotBlank(message = "el celular no debe estar vacio")
-    @Pattern(regexp = "^\\+?([0-9]{2,3})?[0-9]{10}$", message = "Ingresa correctamente tu numero de celular")
+//    @NotNull(message = "el celular no debe ser nulo")
+//    @NotBlank(message = "el celular no debe estar vacio")
+//    @Pattern(regexp = "^\\+?([0-9]{2,3})?[0-9]{10}$", message = "Ingresa correctamente tu numero de celular")
+    @JsonProperty("Celular")
     private String Celular;
 
-    @NotNull(message = "el telefono no debe ser nulo")
-    @NotBlank(message = "el telefono no debe estar vacio")
-    @Pattern(regexp = "^\\+?([0-9]{2,3})?[0-9]{10}$", message = "Ingresa correctamente tu numero de telefono")
+//    @NotNull(message = "el telefono no debe ser nulo")
+//    @NotBlank(message = "el telefono no debe estar vacio")
+//    @Pattern(regexp = "^\\+?([0-9]{2,3})?[0-9]{10}$", message = "Ingresa correctamente tu numero de telefono")
+    @JsonProperty("Telefono")
     private String telefono;
 
-    @NotNull(message = "El CURP no puede ser nulo")
-    @NotBlank(message = "El CURP no puede estar vacío")
-    @Size(min = 18, max = 18, message = "El CURP debe tener exactamente 18 caracteres")
-    @Pattern(regexp = "^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z][0-9]$", message = "El CURP no tiene el formato válido")
+//    @NotNull(message = "El CURP no puede ser nulo")
+//    @NotBlank(message = "El CURP no puede estar vacío")
+//    @Size(min = 18, max = 18, message = "El CURP debe tener exactamente 18 caracteres")
+//    @Pattern(regexp = "^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z][0-9]$", message = "El CURP no tiene el formato válido")
+    @JsonProperty("CURP")
     private String CURP;
 
+    @JsonProperty("Sexo")
     private String Sexo;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
+//    @NotNull(message = "La fecha de nacimiento es obligatoria")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Past(message = "La fecha de nacimiento no puede ser mayor a la fecha actual")
+//    @Past(message = "La fecha de nacimiento no puede ser mayor a la fecha actual")
+    @JsonProperty("FechaNacimiento")
     private Date fechaNacimiento;
 
-    private ArrayList<Direccion> direcciones;
+    @JsonProperty("direccionesJPA")
+private ArrayList<Direccion> direccionesJPA;
+
+
+
+    @JsonProperty("Direccion")
     private Direccion direccion;
-    public Rol rol;
+
+    @JsonProperty("rol")
+    private Rol rol;
+
     private String Imagen;
 
     public Usuario() {
@@ -190,14 +211,22 @@ public class Usuario {
     public void setDireccion(Direccion direccion) {
         this.direccion = direccion;
     }
+    
+    public ArrayList<Direccion> getDireccionesJPA() {
+    return direccionesJPA;
+}
 
-    public ArrayList<Direccion> getDirecciones() {
-        return direcciones;
-    }
+public void setDireccionesJPA(ArrayList<Direccion> direccionesJPA) {
+    this.direccionesJPA = direccionesJPA;
+}
 
-    public void setDirecciones(ArrayList<Direccion> direcciones) {
-        this.direcciones = direcciones;
-    }
+//    public ArrayList<Direccion> getDirecciones() {
+//        return direcciones;
+//    }
+//
+//    public void setDirecciones(ArrayList<Direccion> direcciones) {
+//        this.direcciones = direcciones;
+//    }
 
     public String getImagen() {
         return Imagen;
