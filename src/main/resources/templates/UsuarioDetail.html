@@ -368,7 +368,7 @@
                         Nombre Completo
                     </div>
                     <div class="user-role">
-                        <span class="badge bg-primary" id="displayRole" th:text="${usuario.rol.nombreRol}">Rol</span>
+                        <span class="badge bg-primary" id="displayRole" th:text="${usuario.rol.nombre}">Rol</span>
                     </div>
 
                     <div class="text-center mb-3">
@@ -546,8 +546,8 @@
             </div>
             <div class="card-body-custom">
 
-                <div th:if="${usuario.direcciones != null and !usuario.direcciones.isEmpty()}">
-                    <div th:each="direccion, iterStat : ${usuario.direcciones}" class="mb-4">
+                <div th:if="${usuario.direccionesJPA != null and !usuario.direccionesJPA.isEmpty()}">
+                    <div th:each="direccion, iterStat : ${usuario.direccionesJPA}" class="mb-4">
                         <form th:id="'formDireccion' + ${iterStat.index}"
                               th:action="@{/usuario/direccion/update}"
                               method="post" 
@@ -723,7 +723,7 @@
                     </div>
                 </div>
 
-                <div th:if="${usuario.direcciones == null or usuario.direcciones.isEmpty()}" class="no-addresses">
+                <div th:if="${usuario.direccionesJPA == null or usuario.direccionesJPA.isEmpty()}" class="no-addresses">
                     <i class="bi bi-house-x"></i>
                     <h5>No hay direcciones registradas</h5>
                     <p class="text-muted">Agrega una dirección para este usuario</p>
