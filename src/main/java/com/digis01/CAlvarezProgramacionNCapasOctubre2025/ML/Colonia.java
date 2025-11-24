@@ -1,9 +1,19 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Colonia {
+    
+    @JsonProperty("idColonia")
     private int idColonia;
+    
+    @JsonProperty("nombre")
     private String nombre;
+    
+    @JsonProperty("codigoPostal")
     private String codigoPostal;
+    
+    @JsonProperty("municipioJPA")
     public Municipio Municipio; 
     
 

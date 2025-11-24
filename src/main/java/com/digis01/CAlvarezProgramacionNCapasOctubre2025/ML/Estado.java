@@ -1,9 +1,16 @@
 package com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Estado {
     
+    @JsonProperty("idEstdo")
     private int IdEstado;
+    
+    @JsonProperty("nombre")
     private String Nombre;
+    
+    @JsonProperty("paisJPA")
     public Pais Pais;
     
     public Estado(){}

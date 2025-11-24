@@ -155,24 +155,28 @@
                                 <span th:text="${usuario.rol != null ? usuario.rol.nombre : 'Sin rol'}"></span>
                             </td>
                             <td class="text-start">
-                                <div th:if="${usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()}">
-                                    <div th:each="direccion, iterStat : ${usuario.direccionesJPA}" class="direccion-item">
-                                        <span class="badge-direccion" th:text="'Dir. ' + ${iterStat.count}">Dir. 1</span>
-                                        <div class="mt-1">
-                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
-                                            <small>
-                                                <strong th:text="${direccion.calle} + ' #' + ${direccion.numeroExterior}">Calle y número</strong>
-                                                <span th:if="${direccion.numeroInterior != null && !direccion.numeroInterior.isEmpty()}" 
-                                                      th:text="' Int. ' + ${direccion.numeroInterior}"></span>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div th:if="${usuario.direccionesJPA == null || usuario.direccionesJPA.isEmpty()}" class="text-muted">
-                                    <i class="bi bi-x-circle me-1"></i>
-                                    <small>Sin direcciones registradas</small>
-                                </div>
-                            </td>                        
+    <div th:if="${usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()}">
+        <div th:each="direccion, iterStat : ${usuario.direccionesJPA}" class="direccion-item">
+            <span class="badge-direccion" th:text="'Dir. ' + ${iterStat.count}">Dir. 1</span>
+            <div class="mt-1">
+                <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                <small>
+                    <strong th:text="${direccion.calle} + ' #' + ${direccion.numeroExterior}">Calle y número</strong>
+                    <span th:if="${direccion.numeroInterior != null && !direccion.numeroInterior.isEmpty()}" 
+                          th:text="' Int. ' + ${direccion.numeroInterior}"></span>
+                </small>
+                <!-- Si quieres mostrar la colonia: -->
+                <div th:if="${direccion.colonia != null}">
+                    <span th:text="${direccion.colonia.nombre}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${usuario.direccionesJPA == null || usuario.direccionesJPA.isEmpty()}" class="text-muted">
+        <i class="bi bi-x-circle me-1"></i>
+        <small>Sin direcciones registradas</small>
+    </div>
+</td>                      
                         </tr> 
                     </tbody>
                 </table>
