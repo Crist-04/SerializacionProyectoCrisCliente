@@ -142,6 +142,31 @@ public String DetalleUsuario(@PathVariable("idUsuario") int idUsuario, Model mod
 }
     
 
+
+@PostMapping("/update")
+public String Update(@ModelAttribute("usuario") Usuario usuario,
+        RedirectAttributes redirectAttributes){
+    
+    RestTemplate restTemplate = new RestTemplate();
+    HttpEntity<Usuario> body = new HttpEntity<>(usuario);
+    
+    ResponseEntity<Result<Usuario>> response = restTemplate.exchange(urlBase + "/api/usuario",
+            HttpMethod.PUT, 
+            body, 
+            new ParameterizedTypeReference<Result<Usuario>>() {}
+    );
+    
+    if (response.getBody().correct) {
+        redirectAttributes.addFlashAttribute("successMessage", "Usuario Actualizado");
+        return "redirect:/usuario";
+    }else{
+        redirectAttributes.addFlashAttribute("errorMessage", "No se actualizo");
+        return "redirect:/usuario/detalle/" + usuario.getIdUsuario();
+    }
+    
+}
+
+
     @GetMapping("formulario")
     public String UsuarioForm() {
         return "UsuarioForm";

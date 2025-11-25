@@ -343,7 +343,7 @@
         </div>
 
         <!-- usuario-->
-        <form th:object="${usuario}" th:action="@{/usuario/detalle}" method="post" id="userForm">
+        <form th:object="${usuario}" th:action="@{/usuario/update}" method="post" id="userForm">
             <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
 
             <div class="card-custom">
@@ -817,6 +817,43 @@
 
    <!-- funciones para desbloquear los inputs y botones de direcciones -->
 <th:block layout:fragment="extra-scripts">
+    
+    <script>
+function guardarUsuario() {
+    let payload = {
+        idUsuario: $("#idUsuario").val(),
+        nombre: $("#nombre").val(),
+        apellidoPaterno: $("#apellidoPaterno").val(),
+        apellidoMaterno: $("#apellidoMaterno").val(),
+        userName: $("#userName").val(),
+        email: $("#email").val(),
+        celular: $("#celular").val(),
+        telefono: $("#telefono").val(),
+        curp: $("#curp").val(),
+        sexo: $("input[name='sexo']:checked").val(),
+        fechaNacimiento: $("#fechaNacimiento").val(),
+        rol: {
+            idRol: $("#rol").val()
+        }
+        direccionesJPA: usuarioDirecciones;
+    };
+
+    $.ajax({
+        url: "http://localhost:8080/api/usuario",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify(payload),
+        success: function (r) {
+            Swal.fire("Éxito", "Usuario actualizado correctamente", "success");
+        },
+        error: function () {
+            Swal.fire("Error", "No se pudo actualizar el usuario", "error");
+        }
+    });
+}
+</script>
+
+    
     <script>
         let isEditMode = false;
         let direccionEditStates = {};
