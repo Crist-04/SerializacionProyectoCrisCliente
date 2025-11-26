@@ -548,12 +548,10 @@
             <div class="text-center mt-3">
                 <button type="button" 
                         class="btn btn-success-custom btn-custom"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#modalAgregarDireccion"
                         th:onclick="'prepararModalAgregar(' + ${usuario.idUsuario} + ')'">
-                    <i class="bi bi-plus-square-fill"></i> 
-                    Agregar Dirección
+                    <i class="bi bi-plus-square-fill"></i> Agregar Dirección
                 </button>
+
             </div>
             <div class="card-body-custom">
 
@@ -592,181 +590,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <!--                <div th:if="${usuario.direccionesJPA != null and !usuario.direccionesJPA.isEmpty()}">
-                                    <div th:each="direccion, iterStat : ${usuario.direccionesJPA}" class="mb-4">
-                                        <form th:id="'formDireccion' + ${iterStat.index}"
-                                              th:action="@{/usuario/direccion/update}"
-                                              method="post" 
-                                              class="direccion-form">
-                
-                                             Campos hidden 
-                                            <input type="hidden" name="idDireccion" th:value="${direccion.idDireccion}">
-                                            <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}">
-                
-                                            <div class="address-card">
-                                                <div class="address-number" th:text="${iterStat.index + 1}">1</div>
-                                                <div class="address-info">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">
-                                                            <i class="bi bi-signpost-2"></i>
-                                                            <strong>Calle:</strong>
-                                                        </label>
-                                                        <input type="text" 
-                                                               class="form-control direccion-input" 
-                                                               th:id="'calle' + ${iterStat.index}"
-                                                               name="calle" 
-                                                               th:value="${direccion.calle}" 
-                                                               disabled
-                                                               required>
-                                                    </div>
-                
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">
-                                                                <i class="bi bi-hash"></i>
-                                                                <strong>No. Exterior:</strong>
-                                                            </label>
-                                                            <input type="text" 
-                                                                   class="form-control direccion-input" 
-                                                                   th:id="'numeroExterior' + ${iterStat.index}"
-                                                                   name="numeroExterior" 
-                                                                   th:value="${direccion.numeroExterior}" 
-                                                                   disabled
-                                                                   required>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">
-                                                                <i class="bi bi-hash"></i>
-                                                                <strong>No. Interior:</strong>
-                                                            </label>
-                                                            <input type="text" 
-                                                                   class="form-control direccion-input" 
-                                                                   th:id="'numeroInterior' + ${iterStat.index}"
-                                                                   name="numeroInterior" 
-                                                                   th:value="${direccion.numeroInterior}" 
-                                                                   disabled>
-                                                        </div>
-                                                    </div>
-                
-                                                     dropdown 
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">
-                                                                <i class="bi bi-globe"></i>
-                                                                <strong>País:</strong>
-                                                            </label>
-                                                            <select class="form-select direccion-input" 
-                                                                    th:id="'ddlpais' + ${iterStat.index}"
-                                                                    disabled>
-                                                                <option value="0">Selecciona un país</option>
-                                                                <option value="1" selected>México</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">
-                                                                <i class="bi bi-map"></i>
-                                                                <strong>Estado:</strong>
-                                                            </label>
-                                                            <select class="form-select direccion-input" 
-                                                                    th:id="'ddlestado' + ${iterStat.index}"
-                                                                    th:attr="data-idestado=${direccion.colonia.municipio.estado.idEstado}"
-                                                                    disabled>
-                                                                <option value="0">Selecciona un estado</option>
-                
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                
-                                                    <div class="row mb-3">
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">
-                                                                <i class="bi bi-geo"></i>
-                                                                <strong>Municipio:</strong>
-                                                            </label>
-                                                            <select class="form-select direccion-input" 
-                                                                    th:id="'ddlmunicipio' + ${iterStat.index}"
-                                                                    th:attr="data-idmunicipio=${direccion.colonia.municipio.idMunicipio}"
-                                                                    disabled>
-                                                                <option value="0">Selecciona un municipio</option>
-                
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="form-label">
-                                                                <i class="bi bi-building"></i>
-                                                                <strong>Colonia:</strong>
-                                                            </label>
-                                                            <select class="form-select direccion-input" 
-                                                                    th:id="'ddlcolonia' + ${iterStat.index}"
-                                                                    name="colonia.idColonia" 
-                                                                    disabled
-                                                                    required>
-                                                                <option value="0">Selecciona una colonia</option>
-                                                                <option th:value="${direccion.colonia.idColonia}" 
-                                                                        th:text="${direccion.colonia.nombre}"
-                                                                        selected>Colonia</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                
-                                                    <div class="mb-3">
-                                                        <label class="form-label">
-                                                            <i class="bi bi-mailbox"></i>
-                                                            <strong>Código Postal:</strong>
-                                                        </label>
-                                                        <input type="text" 
-                                                               class="form-control" 
-                                                               th:id="'codigoPostal' + ${iterStat.index}"
-                                                               th:value="${direccion.colonia.codigoPostal}"
-                                                               disabled
-                                                               readonly
-                                                               placeholder="Se cargará automáticamente">
-                                                    </div>
-                
-                                                    <div class="mt-3 d-flex gap-2 flex-wrap">
-                                                        <button type="button" 
-                                                                class="btn btn-primary-custom btn-sm btn-editar-dir" 
-                                                                th:id="'btnEditar' + ${iterStat.index}"
-                                                                th:onclick="'toggleEditDireccion(' + ${iterStat.index} + ')'">
-                                                            <i class="bi bi-pencil"></i> 
-                                                            <span class="btn-text">Editar Dirección</span>
-                                                        </button>
-                
-                                                        <button type="button" 
-                                                                class="btn btn-success-custom btn-sm"
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#modalAgregarDireccion"
-                                                                th:onclick="'prepararModalAgregar(' + ${usuario.idUsuario} + ')'">
-                                                            <i class="bi bi-plus-square-fill"></i> 
-                                                            <span class="btn-text">Agregar Nueva Dirección</span>
-                                                        </button>
-                
-                                                        <button type="button" 
-                                                                class="btn btn-danger-custom btn-sm"
-                                                                th:onclick="'eliminarDireccion(' + ${direccion.idDireccion} + ',' + ${usuario.idUsuario} + ')'">
-                                                            <i class="bi bi-trash"></i> 
-                                                            <span class="btn-text">Eliminar Dirección</span>
-                                                        </button>
-                
-                                                        <button type="submit" 
-                                                                class="btn btn-success-custom btn-sm btn-guardar-dir" 
-                                                                th:id="'btnGuardar' + ${iterStat.index}"
-                                                                style="display: none;">
-                                                            <i class="bi bi-check-circle"></i> Guardar
-                                                        </button>
-                
-                                                        <button type="button" 
-                                                                class="btn btn-secondary-custom btn-sm btn-cancelar-dir" 
-                                                                th:id="'btnCancelar' + ${iterStat.index}"
-                                                                th:onclick="'cancelarEditDireccion(' + ${iterStat.index} + ')'"
-                                                                style="display: none;">
-                                                            <i class="bi bi-x-circle"></i> Cancelar
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>-->
+
             </div>
 
             <div th:if="${usuario.direccionesJPA == null or usuario.direccionesJPA.isEmpty()}" class="no-addresses">
@@ -863,8 +687,6 @@
 
 <!-- funciones para desbloquear los inputs y botones de direcciones -->
 <th:block layout:fragment="extra-scripts">
-
-
     <script>
         function editarDireccion(btn) {
             const idDireccion = btn.dataset.id;
@@ -892,19 +714,10 @@
             document.getElementById("modalNumeroExterior").value = numExt;
             document.getElementById("modalNumeroInterior").value = numInt;
 
-//            cargarEstadosModal(() => {
-//                $("#modalEstado").val(idEstado).trigger("change");
-//
-//                setTimeout(() => {
-//                    $("#modalMunicipio").val(idMunicipio).trigger("change");
-//
-//                    setTimeout(() => {
-//                        $("#modalColonia").val(idColonia).trigger("change");
-//                    }, 400);
-//                }, 400);
-//            });
             cargarEstadosModal(idEstado);
-            
+            cargarMunicipiosModal(idEstado, idMunicipio);
+            cargarColoniasModal(idMunicipio, idColonia);
+
             var modal = new bootstrap.Modal(document.getElementById('modalAgregarDireccion'));
             modal.show();
         }
@@ -1219,18 +1032,26 @@
         }
 
         function prepararModalAgregar(idUsuario) {
-            console.log('Preparando modal para usuario:', idUsuario);
-            document.getElementById('idUsuarioModal').value = idUsuario;
-            document.getElementById('formAgregarDireccion').reset();
-            document.getElementById('modalCodigoPostal').value = '';
 
-            $('#modalEstado').html('<option value="0">Selecciona un estado</option>');
-            $('#modalMunicipio').html('<option value="0">Selecciona un municipio</option>');
-            $('#modalColonia').html('<option value="0">Selecciona una colonia</option>');
+            $("#idUsuarioModal").val(idUsuario);
+
+            $("#modalCalle").val("");
+            $("#modalNumeroExterior").val("");
+            $("#modalNumeroInterior").val("");
+            $("#modalCodigoPostal").val("");
+
+            $("#modalMunicipio").html("<option value='0'>Selecciona un municipio</option>");
+            $("#modalColonia").html("<option value='0'>Selecciona una colonia</option>");
+
+            cargarEstadosModal(0);
 
             configurarEventosModal();
-            cargarEstadosModal();
+
+            var modal = new bootstrap.Modal(document.getElementById('modalAgregarDireccion'));
+            modal.show();
         }
+
+
 
         function configurarEventosModal() {
             $("#modalEstado").off('change').change(function () {
@@ -1246,8 +1067,8 @@
                             const ddlMunicipio = $('#modalMunicipio');
                             ddlMunicipio.empty().append("<option value='0'>Selecciona un municipio</option>");
 
-                            if (data.objects) {
-                                $.each(data.objects, function (i, municipio) {
+                            if (data.object) {
+                                $.each(data.object, function (i, municipio) {
                                     const idMunicipio = getPropertyValue(municipio, 'idMunicipio');
                                     const nombre = getPropertyValue(municipio, 'nombre');
                                     ddlMunicipio.append('<option value="' + idMunicipio + '">' + nombre + '</option>');
@@ -1279,22 +1100,24 @@
                         url: "/usuario/colonia/" + idMunicipio,
                         success: function (data) {
                             console.log('Modal - Colonias recibidas:', data);
+
                             const ddlColonia = $('#modalColonia');
                             ddlColonia.empty().append("<option value='0'>Selecciona una colonia</option>");
 
-                            if (data.objects) {
-                                $.each(data.objects, function (i, colonia) {
-                                    const idColonia = getPropertyValue(colonia, 'idColonia');
+                            if (data.object) {
+                                window.coloniasCargadas = data.object;
+
+                                $.each(data.object, function (i, colonia) {
+                                    const idCol = getPropertyValue(colonia, 'idColonia');
                                     const nombre = getPropertyValue(colonia, 'nombre');
-                                    ddlColonia.append('<option value="' + idColonia + '">' + nombre + '</option>');
+                                    ddlColonia.append('<option value="' + idCol + '">' + nombre + '</option>');
                                 });
                             }
 
                             $('#modalCodigoPostal').val("");
                         },
-                        error: function (xhr) {
+                        error: function () {
                             console.error('Modal - Error cargando colonias');
-                            Swal.fire('Error', 'No se pudieron cargar las colonias', 'error');
                         }
                     });
                 } else {
@@ -1304,28 +1127,29 @@
             });
 
             $("#modalColonia").off('change').change(function () {
-                const idColonia = $(this).val();
-                console.log('Modal - Colonia seleccionada:', idColonia);
+                const idColonia = parseInt($(this).val());
+                console.log("Modal - Colonia seleccionada:", idColonia);
 
-                if (idColonia != "0") {
-                    $.ajax({
-                        type: 'GET',
-                        url: "/usuario/codigopostal/" + idColonia,
-                        success: function (data) {
-                            console.log('Modal - CP recibido:', data);
-                            if (data.correct && data.object) {
-                                const cp = getPropertyValue(data.object, 'codigoPostal');
-                                $('#modalCodigoPostal').val(cp);
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Modal - Error cargando CP');
-                        }
-                    });
+                if (!window.coloniasCargadas) {
+                    console.error("❌ No hay colonias cargadas aún");
+                    return;
+                }
+
+                const coloniaSeleccionada = window.coloniasCargadas.find(c => c.idColonia == idColonia);
+
+                console.log("Colonia encontrada:", coloniaSeleccionada);
+
+                if (coloniaSeleccionada) {
+                    $('#modalCodigoPostal').val(coloniaSeleccionada.codigoPostal);
                 } else {
                     $('#modalCodigoPostal').val("");
                 }
             });
+
+
+
+
+
         }
 
         function cargarEstadosModal(idEstado) {
@@ -1353,6 +1177,68 @@
                 }
             });
         }
+
+        function cargarMunicipiosModal(idEstado, idMunicipio) {
+            console.log('Cargando municipios en modal...');
+
+            $.ajax({
+                type: 'GET',
+                url: "/usuario/municipio/" + idEstado,
+                success: function (data) {
+                    console.log('Modal - Municipios recibidos:', data);
+
+                    $("#modalMunicipio").empty().append("<option value='0'>Selecciona un municipio</option>");
+
+                    if (data.object) {
+                        $.each(data.object, function (i, municipio) {
+                            const idMunicipioTemp = getPropertyValue(municipio, 'idMunicipio');
+                            const nombre = getPropertyValue(municipio, 'nombre');
+                            $("#modalMunicipio").append('<option value="' + idMunicipioTemp + '">' + nombre + '</option>');
+                        });
+                    }
+
+                    $("#modalMunicipio").val(idMunicipio);
+                },
+                error: function (xhr) {
+                    console.error('Modal - Error cargando municipios');
+                    Swal.fire('Error', 'No se pudieron cargar los municipios', 'error');
+                }
+            });
+        }
+
+
+        function cargarColoniasModal(idMunicipio, idColonia) {
+            console.log('Cargando colonias en modal...');
+
+            $.ajax({
+                type: 'GET',
+                url: "/usuario/colonia/" + idMunicipio,
+                success: function (data) {
+                    console.log('Modal - Colonias recibidas:', data);
+
+                    $("#modalColonia").empty().append("<option value='0'>Selecciona una colonia</option>");
+
+                    if (data.object) {
+                        window.coloniasCargadas = data.object;
+
+                        $.each(data.object, function (i, colonia) {
+                            const idColoniaTemp = getPropertyValue(colonia, 'idColonia');
+                            const nombre = getPropertyValue(colonia, 'nombre');
+                            $("#modalColonia").append('<option value="' + idColoniaTemp + '">' + nombre + '</option>');
+                        });
+                    }
+
+                    $("#modalColonia").val(idColonia);
+                },
+                error: function (xhr) {
+                    console.error('Modal - Error cargando colonias');
+                    Swal.fire('Error', 'No se pudieron cargar las colonias', 'error');
+                }
+            });
+        }
+
+
+
 
         function guardarNuevaDireccionModal() {
             const calle = document.getElementById('modalCalle').value.trim();
