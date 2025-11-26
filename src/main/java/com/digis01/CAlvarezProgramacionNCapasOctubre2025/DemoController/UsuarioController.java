@@ -167,6 +167,231 @@ public String Update(@ModelAttribute("usuario") Usuario usuario,
 }
 
 
+
+    @PostMapping("/direccion/update")
+public String updateDireccion(
+        @RequestParam("idDireccion") int idDireccion,
+        @RequestParam("idUsuario") int idUsuario,
+        @RequestParam("calle") String calle,
+        @RequestParam("numeroExterior") String numeroExterior,
+        @RequestParam(value = "numeroInterior", required = false) String numeroInterior,
+        @RequestParam("colonia.idColonia") int idColonia,
+        RedirectAttributes redirectAttributes) {
+    
+    try {
+        Direccion direccion = new Direccion();
+        direccion.setIdDireccion(idDireccion);
+        direccion.setCalle(calle);
+        direccion.setNumeroExterior(numeroExterior);
+        direccion.setNumeroInterior(numeroInterior);
+        
+        Colonia colonia = new Colonia();
+        colonia.setIdColonia(idColonia);
+        direccion.setColonia(colonia);
+        
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<Direccion> body = new HttpEntity<>(direccion);
+        
+        ResponseEntity<Result> response = restTemplate.exchange(
+                urlBase + "/api/direccion/" + idUsuario,  // ← Cambiado aquí
+                HttpMethod.PUT, 
+                body,
+                new ParameterizedTypeReference<Result>() {}
+        );
+        
+        if (response.getBody() != null && response.getBody().correct) {
+            redirectAttributes.addFlashAttribute("successMessage", "Dirección Actualizada");   
+        } else {
+            String errorMsg = response.getBody() != null ? response.getBody().errorMessage : "Error";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + errorMsg);
+        }  
+    } catch (Exception ex) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar: " + ex.getMessage());
+    }
+    return "redirect:/usuario/detalle/" + idUsuario;
+}
+
+    @PostMapping("/direccion/add")
+    @ResponseBody
+    public Result addDireccion(
+            @RequestParam("idUsuario") int idUsuario,
+            @RequestParam("calle") String calle,
+            @RequestParam("numeroExterior") String numeroExterior,
+            @RequestParam(value = "numeroInterior", required = false) String numeroInterior,
+            @RequestParam("colonia.idColonia") int idColonia) {
+        
+        try {
+            Direccion direccion = new Direccion();
+            direccion.setCalle(calle);
+            direccion.setNumeroExterior(numeroExterior);
+            direccion.setNumeroInterior(numeroInterior);
+            
+            Colonia colonia = new Colonia();
+            colonia.setIdColonia(idColonia);
+            direccion.setColonia(colonia);
+            
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(idUsuario);
+
+            
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<Direccion> body = new HttpEntity<>(direccion);
+            
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/direccion",
+                    HttpMethod.POST, 
+                    body,
+                    new ParameterizedTypeReference<Result>() {}
+            );
+            
+            return response.getBody();
+            
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            return result;
+        }
+    }
+
+    @PostMapping("/direccion/delete")
+    @ResponseBody
+    public Result deleteDireccion(@RequestParam("idDireccion") int idDireccion) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/direccion/" + idDireccion,
+                    HttpMethod.DELETE,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {}
+            );
+            
+            return response.getBody();
+            
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            return result;
+        }
+    }
+
+    
+    @GetMapping("/pais")
+    @ResponseBody
+    public Result getPais() {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/pais",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {}
+            );
+            return response.getBody();
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            return result;
+        }
+    }
+
+    @GetMapping("/estado/{idPais}")
+    @ResponseBody
+    public Result getEstadosByPais(@PathVariable int idPais) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            ResponseEntity<Result> response = restTemplate.exchange(
+                urlBase + "/api/estado/idPais/" + idPais,
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result>() {}
+            );
+            
+            return response.getBody();
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            return result;
+        }
+    }
+
+    @GetMapping("/municipio/{idEstado}")
+    @ResponseBody
+    public Result getMunicipioByIdEstado(@PathVariable int idEstado) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/municipio/idEstado/" + idEstado,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY, 
+                    new ParameterizedTypeReference<Result>() {}
+            );
+            return response.getBody();
+            
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            return result;
+        }
+    }
+
+    @GetMapping("/colonia/{idMunicipio}")
+    @ResponseBody
+    public Result getColoniasByMunicipio(@PathVariable int idMunicipio) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            ResponseEntity<Result> response = restTemplate.exchange(
+                urlBase + "/api/colonia/municipio/" + idMunicipio,
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result>() {}
+            );
+            
+            return response.getBody();
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            return result;
+        }
+    }
+
+    // ✅ CORREGIDO: Endpoint para código postal
+    @GetMapping("/codigopostal/{idColonia}")
+    @ResponseBody
+    public Result getCodigoPostalByColonia(@PathVariable int idColonia) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            
+            // ✅ CORRECCIÓN: Debe buscar la colonia específica, no todas las del municipio
+            ResponseEntity<Result> response = restTemplate.exchange(
+                urlBase + "/api/colonia/" + idColonia,  // Endpoint correcto para obtener una colonia
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result>() {}
+            );
+            
+            return response.getBody();
+        } catch (Exception ex) {
+            Result result = new Result();
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            return result;
+        }
+    }
+
+
+
+
     @GetMapping("formulario")
     public String UsuarioForm() {
         return "UsuarioForm";
