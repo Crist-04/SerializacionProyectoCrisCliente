@@ -573,7 +573,8 @@
                                         data-numeroint=${direccion.numeroInterior},
                                         data-colonia=${direccion.colonia.idColonia},
                                         data-municipio=${direccion.colonia.municipio.idMunicipio},
-                                        data-estado=${direccion.colonia.municipio.estado.idEstado}"
+                                        data-estado=${direccion.colonia.municipio.estado.idEstado},
+                                        data-idusuario=${usuario.idUsuario}"
                                         onclick="editarDireccion(this)">
                                     <i class="bi bi-pencil"></i> Editar Dirección
                                 </button>
@@ -677,7 +678,7 @@
                     <i class="bi bi-x-circle"></i> Cancelar
                 </button>
                 <button type="button" class="btn btn-success-custom btn-custom" onclick="guardarNuevaDireccionModal()">
-                    <i class="bi bi-check-circle"></i> Guardar Dirección
+                    <i class="bi bi-check-circle"></i> <span id="btnTextoGuardar">Guardar Dirección</span>
                 </button>
             </div>
         </div>
@@ -688,6 +689,8 @@
 <!-- funciones para desbloquear los inputs y botones de direcciones -->
 <th:block layout:fragment="extra-scripts">
     <script>
+        const API_BASE_URL = "http://localhost:8080"; 
+
         function editarDireccion(btn) {
             const idDireccion = btn.dataset.id;
             const calle = btn.dataset.calle;
@@ -696,34 +699,34 @@
             const idColonia = btn.dataset.colonia;
             const idMunicipio = btn.dataset.municipio;
             const idEstado = btn.dataset.estado;
+            const idUsuario = btn.dataset.idusuario;
 
-            document.getElementById("modalAgregarDireccionLabel").innerHTML =
-                    `<i class="bi bi-pencil-square"></i> Editar Dirección`;
+            $("#modalAgregarDireccionLabel").html('<i class="bi bi-pencil-square"></i> Editar Dirección');
 
-            if (!document.getElementById("idDireccionModal")) {
+            if (!$("#idDireccionModal").length) {
                 const input = document.createElement("input");
                 input.type = "hidden";
                 input.id = "idDireccionModal";
                 input.name = "idDireccion";
                 document.getElementById("formAgregarDireccion").appendChild(input);
             }
-            document.getElementById("idDireccionModal").value = idDireccion;
+            $("#idDireccionModal").val(idDireccion);
+            $("#idUsuarioModal").val(idUsuario);
 
-
-            document.getElementById("modalCalle").value = calle;
-            document.getElementById("modalNumeroExterior").value = numExt;
-            document.getElementById("modalNumeroInterior").value = numInt;
+            $("#modalCalle").val(calle);
+            $("#modalNumeroExterior").val(numExt);
+            $("#modalNumeroInterior").val(numInt);
 
             cargarEstadosModal(idEstado);
             cargarMunicipiosModal(idEstado, idMunicipio);
             cargarColoniasModal(idMunicipio, idColonia);
 
+            configurarEventosModal();
+
             var modal = new bootstrap.Modal(document.getElementById('modalAgregarDireccion'));
             modal.show();
         }
-
     </script>
-
 
     <script>
         let isEditMode = false;
@@ -988,7 +991,6 @@
                                                             ddlColonia.append("<option value='" + idColonia + "'>" + nombre + "</option>");
                                                         });
 
-                                                        // ✅ Si hay colonia actual, seleccionarla
                                                         if (idColoniaActual && idColoniaActual != 0) {
                                                             ddlColonia.val(idColoniaActual);
                                                         }
@@ -1032,6 +1034,11 @@
         }
 
         function prepararModalAgregar(idUsuario) {
+            $("#modalAgregarDireccionLabel").html('<i class="bi bi-plus-circle"></i> Agregar Nueva Dirección');
+
+            if ($("#idDireccionModal").length) {
+                $("#idDireccionModal").remove();
+            }
 
             $("#idUsuarioModal").val(idUsuario);
 
@@ -1040,18 +1047,16 @@
             $("#modalNumeroInterior").val("");
             $("#modalCodigoPostal").val("");
 
+            $("#modalEstado").val("0");
             $("#modalMunicipio").html("<option value='0'>Selecciona un municipio</option>");
             $("#modalColonia").html("<option value='0'>Selecciona una colonia</option>");
 
             cargarEstadosModal(0);
-
             configurarEventosModal();
 
             var modal = new bootstrap.Modal(document.getElementById('modalAgregarDireccion'));
             modal.show();
         }
-
-
 
         function configurarEventosModal() {
             $("#modalEstado").off('change').change(function () {
@@ -1145,11 +1150,6 @@
                     $('#modalCodigoPostal').val("");
                 }
             });
-
-
-
-
-
         }
 
         function cargarEstadosModal(idEstado) {
@@ -1159,7 +1159,6 @@
                 url: "/usuario/estado/1",
                 success: function (data) {
                     console.log('Modal - Estados recibidos:', data);
-//                    const ddlEstado = $('#modalEstado');
                     $("#modalEstado").empty().append("<option value='0'>Selecciona un estado</option>");
 
                     if (data.object) {
@@ -1206,7 +1205,6 @@
             });
         }
 
-
         function cargarColoniasModal(idMunicipio, idColonia) {
             console.log('Cargando colonias en modal...');
 
@@ -1237,123 +1235,83 @@
             });
         }
 
-
-
-
         function guardarNuevaDireccionModal() {
-            const calle = document.getElementById('modalCalle').value.trim();
-            const numeroExterior = document.getElementById('modalNumeroExterior').value.trim();
-            const numeroInterior = document.getElementById('modalNumeroInterior').value.trim();
-            const colonia = document.getElementById('modalColonia').value;
-            const idUsuario = document.getElementById('idUsuarioModal').value;
+            const idDireccion = $("#idDireccionModal").val();
+            const calle = $("#modalCalle").val();
+            const numeroExterior = $("#modalNumeroExterior").val();
+            const numeroInterior = $("#modalNumeroInterior").val();
+            const idColonia = $("#modalColonia").val();
+            const idUsuario = $("#idUsuarioModal").val();
 
-            if (!calle || !numeroExterior || !colonia || colonia == "0") {
-                Swal.fire({
-                    title: 'Campos incompletos',
-                    text: 'Por favor completa todos los campos obligatorios',
-                    icon: 'warning'
-                });
+            if (!calle || !numeroExterior || idColonia === "0") {
+                Swal.fire("Campos incompletos", "Completa los campos obligatorios", "warning");
                 return;
             }
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalAgregarDireccion'));
-            modal.hide();
-
-            Swal.fire({
-                title: 'Guardando...',
-                text: 'Por favor espera',
-                allowOutsideClick: false,
-                didOpen: function () {
-                    Swal.showLoading();
+            const direccionJSON = {
+                calle: calle,
+                numeroExterior: numeroExterior,
+                numeroInterior: numeroInterior,
+                coloniaJPA: {
+                    idColonia: parseInt(idColonia)
                 }
-            });
+            };
 
-            $.ajax({
-                type: 'POST',
-                url: '/usuario/direccion/add',
-                data: {
-                    idUsuario: idUsuario,
-                    calle: calle,
-                    numeroExterior: numeroExterior,
-                    numeroInterior: numeroInterior,
-                    'colonia.idColonia': colonia
-                },
-                success: function (response) {
-                    direccionEditStates = {};
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: 'Dirección agregada correctamente',
-                        icon: 'success',
-                        timer: 1000,
-                        showConfirmButton: false
-                    }).then(function () {
-                        window.location.href = '/usuario/detalle/' + idUsuario + '?t=' + new Date().getTime();
-                    });
-                },
-                error: function () {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'No se pudo agregar la dirección',
-                        icon: 'error'
-                    });
-                }
-            });
+            if (idDireccion && idDireccion != "") {
+                direccionJSON.idDireccion = parseInt(idDireccion);
+
+                $.ajax({
+                    type: "PUT",
+                    url: `${API_BASE_URL}/api/direccion/${idUsuario}`, 
+                    contentType: "application/json",
+                    data: JSON.stringify(direccionJSON),
+                    success: function (response) {
+                        Swal.fire("Actualizada", "La dirección fue actualizada correctamente", "success")
+                                .then(() => location.reload());
+                    },
+                    error: function (xhr) {
+                        console.error('Error:', xhr);
+                        Swal.fire("Error", "No se pudo actualizar la dirección", "error");
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: `${API_BASE_URL}/api/direccion/${idUsuario}`, 
+                    contentType: "application/json",
+                    data: JSON.stringify(direccionJSON),
+                    success: function (response) {
+                        Swal.fire("¡Éxito!", "Dirección agregada correctamente", "success")
+                                .then(() => location.reload());
+                    },
+                    error: function (xhr) {
+                        console.error('Error:', xhr);
+                        Swal.fire("Error", "No se pudo agregar la dirección", "error");
+                    }
+                });
+            }
         }
 
         function eliminarDireccion(idDireccion, idUsuario) {
             Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Esta dirección se eliminará permanentemente",
-                icon: 'warning',
+                title: "¿Eliminar?",
+                text: "La dirección se eliminará definitivamente",
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: '#ff6b6b',
-                cancelButtonColor: '#a8a8a8',
-                confirmButtonText: '<i class="bi bi-trash"></i> Sí, eliminar',
-                cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar',
-                reverseButtons: true
-            }).then(function (result) {
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then(result => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Eliminando...',
-                        text: 'Por favor espera',
-                        allowOutsideClick: false,
-                        didOpen: function () {
-                            Swal.showLoading();
-                        }
-                    });
-
                     $.ajax({
-                        type: 'POST',
-                        url: '/usuario/direccion/delete',
-                        data: {
-                            idDireccion: idDireccion
+                        type: "DELETE",
+                        url: `${API_BASE_URL}/api/direccion/${idDireccion}`, // ⭐ MODIFICADO
+                        success: function () {
+                            Swal.fire("Eliminada", "La dirección fue eliminada", "success")
+                                    .then(() => location.reload());
                         },
-                        success: function (response) {
-                            if (response.correct) {
-                                Swal.fire({
-                                    title: '¡Eliminado!',
-                                    text: 'La dirección ha sido eliminada correctamente',
-                                    icon: 'success',
-                                    confirmButtonText: 'OK'
-                                }).then(function () {
-                                    window.location.href = '/usuario/detalle/' + idUsuario;
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: response.errorMessage || 'No se pudo eliminar la dirección',
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        },
-                        error: function () {
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Hubo un problema al conectar con el servidor',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
+                        error: function (xhr) {
+                            console.error('Error:', xhr);
+                            Swal.fire("Error", "No se pudo eliminar", "error");
                         }
                     });
                 }
