@@ -74,142 +74,140 @@ public class UsuarioController {
 
         return "UsuarioIndex";
     }
-    
-    
-    
+
     @GetMapping("/detalle/{idUsuario}")
-public String DetalleUsuario(@PathVariable("idUsuario") int idUsuario, Model model) {
-    try {
-        System.out.println("=== Obteniendo usuario con ID: " + idUsuario + " ===");
-        
-        RestTemplate restTemplate = new RestTemplate();
-        
-        ResponseEntity<Result<Usuario>> responseEntity = restTemplate.exchange(
-            urlBase + "/api/usuario/" + idUsuario,
-            HttpMethod.GET,
-            HttpEntity.EMPTY,
-            new ParameterizedTypeReference<Result<Usuario>>() {}
-        );
-        
-        System.out.println("Status code: " + responseEntity.getStatusCode().value());
-        
-        if (responseEntity.getStatusCode().value() == 200) {
-            Result result = responseEntity.getBody();
-            
-            System.out.println("Result.correct: " + result.correct);
-            
-            if (result.correct && result.object != null) {
-                Usuario usuario = (Usuario) result.object;
-                
-                System.out.println("Usuario encontrado: " + usuario.getNombre());
-                System.out.println("Direcciones: " + (usuario.getDireccionesJPA() != null ? usuario.getDireccionesJPA().size() : "null"));
-                
-                model.addAttribute("usuario", usuario);
-                
-                // Cargar roles para el dropdown
-                ResponseEntity<Result<List<Rol>>> rolesResponse = restTemplate.exchange(
-                    urlBase + "/api/rol",
+    public String DetalleUsuario(@PathVariable("idUsuario") int idUsuario, Model model) {
+        try {
+            System.out.println("=== Obteniendo usuario con ID: " + idUsuario + " ===");
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result<Usuario>> responseEntity = restTemplate.exchange(
+                    urlBase + "/api/usuario/" + idUsuario,
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
-                    new ParameterizedTypeReference<Result<List<Rol>>>() {}
-                );
-                
-                if (rolesResponse.getBody() != null && rolesResponse.getBody().objects != null) {
-                    model.addAttribute("roles", rolesResponse.getBody().objects);
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            }
+            );
+
+            System.out.println("Status code: " + responseEntity.getStatusCode().value());
+
+            if (responseEntity.getStatusCode().value() == 200) {
+                Result result = responseEntity.getBody();
+
+                System.out.println("Result.correct: " + result.correct);
+
+                if (result.correct && result.object != null) {
+                    Usuario usuario = (Usuario) result.object;
+
+                    System.out.println("Usuario encontrado: " + usuario.getNombre());
+                    System.out.println("Direcciones: " + (usuario.getDireccionesJPA() != null ? usuario.getDireccionesJPA().size() : "null"));
+
+                    model.addAttribute("usuario", usuario);
+
+                    // Cargar roles para el dropdown
+                    ResponseEntity<Result<List<Rol>>> rolesResponse = restTemplate.exchange(
+                            urlBase + "/api/rol",
+                            HttpMethod.GET,
+                            HttpEntity.EMPTY,
+                            new ParameterizedTypeReference<Result<List<Rol>>>() {
+                    }
+                    );
+
+                    if (rolesResponse.getBody() != null && rolesResponse.getBody().objects != null) {
+                        model.addAttribute("roles", rolesResponse.getBody().objects);
+                    }
+
+                    System.out.println("=== Retornando vista UsuarioDetail ===");
+                    return "UsuarioDetail";
+
+                } else {
+                    System.out.println("=== Usuario no encontrado ===");
+                    model.addAttribute("errorMessage", "Usuario no encontrado");
+                    return "redirect:/usuario";
                 }
-                
-                System.out.println("=== Retornando vista UsuarioDetail ===");
-                return "UsuarioDetail";
-                
+
             } else {
-                System.out.println("=== Usuario no encontrado ===");
-                model.addAttribute("errorMessage", "Usuario no encontrado");
+                System.out.println("=== Error en la respuesta de la API ===");
+                model.addAttribute("errorMessage", "Error al consultar la API");
                 return "redirect:/usuario";
             }
-            
-        } else {
-            System.out.println("=== Error en la respuesta de la API ===");
-            model.addAttribute("errorMessage", "Error al consultar la API");
+
+        } catch (Exception ex) {
+            System.out.println("=== ERROR en DetalleUsuario ===");
+            ex.printStackTrace();
+            model.addAttribute("errorMessage", "Error al cargar el detalle: " + ex.getMessage());
             return "redirect:/usuario";
         }
-        
-    } catch (Exception ex) {
-        System.out.println("=== ERROR en DetalleUsuario ===");
-        ex.printStackTrace();
-        model.addAttribute("errorMessage", "Error al cargar el detalle: " + ex.getMessage());
-        return "redirect:/usuario";
     }
-}
-    
 
+    @PostMapping("/update")
+    public String Update(@ModelAttribute("usuario") Usuario usuario,
+            RedirectAttributes redirectAttributes) {
 
-@PostMapping("/update")
-public String Update(@ModelAttribute("usuario") Usuario usuario,
-        RedirectAttributes redirectAttributes){
-    
-    RestTemplate restTemplate = new RestTemplate();
-    HttpEntity<Usuario> body = new HttpEntity<>(usuario);
-    
-    ResponseEntity<Result<Usuario>> response = restTemplate.exchange(urlBase + "/api/usuario",
-            HttpMethod.PUT, 
-            body, 
-            new ParameterizedTypeReference<Result<Usuario>>() {}
-    );
-    
-    if (response.getBody().correct) {
-        redirectAttributes.addFlashAttribute("successMessage", "Usuario Actualizado");
-        return "redirect:/usuario";
-    }else{
-        redirectAttributes.addFlashAttribute("errorMessage", "No se actualizo");
-        return "redirect:/usuario/detalle/" + usuario.getIdUsuario();
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<Usuario> body = new HttpEntity<>(usuario);
+
+        ResponseEntity<Result<Usuario>> response = restTemplate.exchange(urlBase + "/api/usuario",
+                HttpMethod.PUT,
+                body,
+                new ParameterizedTypeReference<Result<Usuario>>() {
+        }
+        );
+
+        if (response.getBody().correct) {
+            redirectAttributes.addFlashAttribute("successMessage", "Usuario Actualizado");
+            return "redirect:/usuario";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "No se actualizo");
+            return "redirect:/usuario/detalle/" + usuario.getIdUsuario();
+        }
+
     }
-    
-}
-
-
 
     @PostMapping("/direccion/update")
-public String updateDireccion(
-        @RequestParam("idDireccion") int idDireccion,
-        @RequestParam("idUsuario") int idUsuario,
-        @RequestParam("calle") String calle,
-        @RequestParam("numeroExterior") String numeroExterior,
-        @RequestParam(value = "numeroInterior", required = false) String numeroInterior,
-        @RequestParam("colonia.idColonia") int idColonia,
-        RedirectAttributes redirectAttributes) {
-    
-    try {
-        Direccion direccion = new Direccion();
-        direccion.setIdDireccion(idDireccion);
-        direccion.setCalle(calle);
-        direccion.setNumeroExterior(numeroExterior);
-        direccion.setNumeroInterior(numeroInterior);
-        
-        Colonia colonia = new Colonia();
-        colonia.setIdColonia(idColonia);
-        direccion.setColonia(colonia);
-        
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<Direccion> body = new HttpEntity<>(direccion);
-        
-        ResponseEntity<Result> response = restTemplate.exchange(
-                urlBase + "/api/direccion/" + idUsuario,  // ← Cambiado aquí
-                HttpMethod.PUT, 
-                body,
-                new ParameterizedTypeReference<Result>() {}
-        );
-        
-        if (response.getBody() != null && response.getBody().correct) {
-            redirectAttributes.addFlashAttribute("successMessage", "Dirección Actualizada");   
-        } else {
-            String errorMsg = response.getBody() != null ? response.getBody().errorMessage : "Error";
-            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + errorMsg);
-        }  
-    } catch (Exception ex) {
-        redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar: " + ex.getMessage());
+    public String updateDireccion(
+            @RequestParam("idDireccion") int idDireccion,
+            @RequestParam("idUsuario") int idUsuario,
+            @RequestParam("calle") String calle,
+            @RequestParam("numeroExterior") String numeroExterior,
+            @RequestParam(value = "numeroInterior", required = false) String numeroInterior,
+            @RequestParam("colonia.idColonia") int idColonia,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            Direccion direccion = new Direccion();
+            direccion.setIdDireccion(idDireccion);
+            direccion.setCalle(calle);
+            direccion.setNumeroExterior(numeroExterior);
+            direccion.setNumeroInterior(numeroInterior);
+
+            Colonia colonia = new Colonia();
+            colonia.setIdColonia(idColonia);
+            direccion.setColonia(colonia);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<Direccion> body = new HttpEntity<>(direccion);
+
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/direccion/" + idUsuario, // ← Cambiado aquí
+                    HttpMethod.PUT,
+                    body,
+                    new ParameterizedTypeReference<Result>() {
+            }
+            );
+
+            if (response.getBody() != null && response.getBody().correct) {
+                redirectAttributes.addFlashAttribute("successMessage", "Dirección Actualizada");
+            } else {
+                String errorMsg = response.getBody() != null ? response.getBody().errorMessage : "Error";
+                redirectAttributes.addFlashAttribute("errorMessage", "Error: " + errorMsg);
+            }
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar: " + ex.getMessage());
+        }
+        return "redirect:/usuario/detalle/" + idUsuario;
     }
-    return "redirect:/usuario/detalle/" + idUsuario;
-}
 
     @PostMapping("/direccion/add")
     @ResponseBody
@@ -219,33 +217,33 @@ public String updateDireccion(
             @RequestParam("numeroExterior") String numeroExterior,
             @RequestParam(value = "numeroInterior", required = false) String numeroInterior,
             @RequestParam("colonia.idColonia") int idColonia) {
-        
+
         try {
             Direccion direccion = new Direccion();
             direccion.setCalle(calle);
             direccion.setNumeroExterior(numeroExterior);
             direccion.setNumeroInterior(numeroInterior);
-            
+
             Colonia colonia = new Colonia();
             colonia.setIdColonia(idColonia);
             direccion.setColonia(colonia);
-            
+
             Usuario usuario = new Usuario();
             usuario.setIdUsuario(idUsuario);
 
-            
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Direccion> body = new HttpEntity<>(direccion);
-            
+
             ResponseEntity<Result> response = restTemplate.exchange(
                     urlBase + "/api/direccion",
-                    HttpMethod.POST, 
+                    HttpMethod.POST,
                     body,
-                    new ParameterizedTypeReference<Result>() {}
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
-            
+
             return response.getBody();
-            
+
         } catch (Exception ex) {
             Result result = new Result();
             result.correct = false;
@@ -259,16 +257,17 @@ public String updateDireccion(
     public Result deleteDireccion(@RequestParam("idDireccion") int idDireccion) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             ResponseEntity<Result> response = restTemplate.exchange(
                     urlBase + "/api/direccion/" + idDireccion,
                     HttpMethod.DELETE,
                     HttpEntity.EMPTY,
-                    new ParameterizedTypeReference<Result>() {}
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
-            
+
             return response.getBody();
-            
+
         } catch (Exception ex) {
             Result result = new Result();
             result.correct = false;
@@ -277,18 +276,18 @@ public String updateDireccion(
         }
     }
 
-    
     @GetMapping("/pais")
     @ResponseBody
     public Result getPais() {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             ResponseEntity<Result> response = restTemplate.exchange(
                     urlBase + "/api/pais",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
-                    new ParameterizedTypeReference<Result>() {}
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
             return response.getBody();
         } catch (Exception ex) {
@@ -304,14 +303,15 @@ public String updateDireccion(
     public Result getEstadosByPais(@PathVariable int idPais) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             ResponseEntity<Result> response = restTemplate.exchange(
-                urlBase + "/api/estado/idPais/" + idPais,
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                new ParameterizedTypeReference<Result>() {}
+                    urlBase + "/api/estado/idPais/" + idPais,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
-            
+
             return response.getBody();
         } catch (Exception ex) {
             Result result = new Result();
@@ -326,15 +326,16 @@ public String updateDireccion(
     public Result getMunicipioByIdEstado(@PathVariable int idEstado) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             ResponseEntity<Result> response = restTemplate.exchange(
                     urlBase + "/api/municipio/idEstado/" + idEstado,
                     HttpMethod.GET,
-                    HttpEntity.EMPTY, 
-                    new ParameterizedTypeReference<Result>() {}
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
             return response.getBody();
-            
+
         } catch (Exception ex) {
             Result result = new Result();
             result.correct = false;
@@ -348,14 +349,15 @@ public String updateDireccion(
     public Result getColoniasByMunicipio(@PathVariable int idMunicipio) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             ResponseEntity<Result> response = restTemplate.exchange(
-                urlBase + "/api/colonia/municipio/" + idMunicipio,
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                new ParameterizedTypeReference<Result>() {}
+                    urlBase + "/api/colonia/municipio/" + idMunicipio,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
-            
+
             return response.getBody();
         } catch (Exception ex) {
             Result result = new Result();
@@ -371,15 +373,16 @@ public String updateDireccion(
     public Result getCodigoPostalByColonia(@PathVariable int idColonia) {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            
+
             // ✅ CORRECCIÓN: Debe buscar la colonia específica, no todas las del municipio
             ResponseEntity<Result> response = restTemplate.exchange(
-                urlBase + "/api/colonia/" + idColonia,  // Endpoint correcto para obtener una colonia
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                new ParameterizedTypeReference<Result>() {}
+                    urlBase + "/api/colonia/" + idColonia, // Endpoint correcto para obtener una colonia
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            }
             );
-            
+
             return response.getBody();
         } catch (Exception ex) {
             Result result = new Result();
@@ -389,91 +392,115 @@ public String updateDireccion(
         }
     }
 
-
-
-
     @GetMapping("formulario")
-public String UsuarioForm(Model model) {
-    Usuario usuario = new Usuario();
-    
-    // Inicializar lista de direcciones
-    ArrayList<Direccion> direcciones = new ArrayList<>();
-    direcciones.add(new Direccion());
-    usuario.setDireccionesJPA(direcciones);
-    
-    model.addAttribute("usuario", usuario);
-    
-    // Cargar roles
-    try {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Result<List<Rol>>> response = restTemplate.exchange(
-            urlBase + "/api/rol",
-            HttpMethod.GET,
-            HttpEntity.EMPTY,
-            new ParameterizedTypeReference<Result<List<Rol>>>() {}
-        );
-        
-        if (response.getBody() != null) {
-            Result result = response.getBody();
-            // Intenta con objects o object
-            List<Rol> roles = result.objects != null ? result.objects : (List<Rol>)result.object;
-            model.addAttribute("roles", roles != null ? roles : new ArrayList<>());
-            
-            System.out.println("=== ROLES CARGADOS: " + (roles != null ? roles.size() : "null") + " ===");
+    public String UsuarioForm(Model model) {
+        Usuario usuario = new Usuario();
+
+        // Inicializar lista de direcciones
+        ArrayList<Direccion> direcciones = new ArrayList<>();
+        direcciones.add(new Direccion());
+        usuario.setDireccionesJPA(direcciones);
+
+        model.addAttribute("usuario", usuario);
+
+        // Cargar roles
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Result<List<Rol>>> response = restTemplate.exchange(
+                    urlBase + "/api/rol",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Rol>>>() {
+            }
+            );
+
+            if (response.getBody() != null) {
+                Result result = response.getBody();
+                // Intenta con objects o object
+                List<Rol> roles = result.objects != null ? result.objects : (List<Rol>) result.object;
+                model.addAttribute("roles", roles != null ? roles : new ArrayList<>());
+
+                System.out.println("=== ROLES CARGADOS: " + (roles != null ? roles.size() : "null") + " ===");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            model.addAttribute("roles", new ArrayList<>());
         }
-    } catch (Exception ex) {
-        ex.printStackTrace();
-        model.addAttribute("roles", new ArrayList<>());
+
+        return "UsuarioForm";
     }
-    
-    return "UsuarioForm";
-}
 
+    @PostMapping("/add")
+    public String Add(
+            @Valid @ModelAttribute("usuario") Usuario usuario,
+            BindingResult bindingResult,
+            @RequestParam(value = "foto", required = false) MultipartFile foto,
+            RedirectAttributes redirectAttributes) {
 
-@PostMapping("/add")
-public String Add(
-        @ModelAttribute("usuario") Usuario usuario,
-        @RequestParam(value = "foto", required = false) MultipartFile foto,
-        RedirectAttributes redirectAttributes) {
-    
-    try {
-        // Procesar foto si existe
-        if (foto != null && !foto.isEmpty()) {
-            byte[] imagenBytes = foto.getBytes();
-            String imagenBase64 = Base64.getEncoder().encodeToString(imagenBytes);
-            usuario.setImagen(imagenBase64);
-        }
-        
-        System.out.println("=== ENVIANDO USUARIO A API ===");
-        System.out.println("Nombre: " + usuario.getNombre());
-        System.out.println("Email: " + usuario.getEmail());
-        
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<Usuario> body = new HttpEntity<>(usuario);
-        
-        ResponseEntity<Result<Usuario>> response = restTemplate.exchange(
-            urlBase + "/api/usuario",
-            HttpMethod.POST,
-            body,
-            new ParameterizedTypeReference<Result<Usuario>>() {}
-        );
-        
-        if (response.getBody() != null && response.getBody().correct) {
-            redirectAttributes.addFlashAttribute("successMessage", "Usuario registrado exitosamente");
-            return "redirect:/usuario";
-        } else {
-            String error = response.getBody() != null ? response.getBody().errorMessage : "Error desconocido";
-            redirectAttributes.addFlashAttribute("errorMessage", "Error al registrar: " + error);
+        try {
+            if (foto != null && !foto.isEmpty()) {
+                String contentType = foto.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    redirectAttributes.addFlashAttribute("errorMessage",
+                            "El archivo debe ser una imagen (JPG, PNG, etc.)");
+                    return "redirect:/usuario/formulario";
+                }
+
+                byte[] imagenBytes = foto.getBytes();
+                String imagenBase64 = Base64.getEncoder().encodeToString(imagenBytes);
+                usuario.setImagen(imagenBase64);
+
+                System.out.println(" Imagen procesada:");
+                System.out.println("  - Tipo: " + contentType);
+                System.out.println("  - Tamaño original: " + foto.getSize() + " bytes");
+                System.out.println("  - Base64 length: " + imagenBase64.length() + " caracteres");
+            } else {
+                System.out.println("⚠️ No se recibió imagen");
+            }
+
+            System.out.println("\n=== ENVIANDO USUARIO A API ===");
+            System.out.println("Nombre: " + usuario.getNombre());
+            System.out.println("UserName: " + usuario.getUserName());
+            System.out.println("Email: " + usuario.getEmail());
+            System.out.println("Imagen presente: " + (usuario.getImagen() != null ? "SÍ" : "NO"));
+            System.out.println("Rol ID: " + (usuario.getRol() != null ? usuario.getRol().getIdRol() : "null"));
+            System.out.println("Direcciones: " + (usuario.getDireccionesJPA() != null ? usuario.getDireccionesJPA().size() : "null"));
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<Usuario> body = new HttpEntity<>(usuario);
+
+            ResponseEntity<Result<Usuario>> response = restTemplate.exchange(
+                    urlBase + "/api/usuario",
+                    HttpMethod.POST,
+                    body,
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            }
+            );
+
+            // ✅ PASO 4: Procesar respuesta
+            if (response.getBody() != null && response.getBody().correct) {
+                System.out.println("✅ Usuario registrado exitosamente");
+                redirectAttributes.addFlashAttribute("successMessage", "Usuario registrado exitosamente");
+                return "redirect:/usuario";
+            } else {
+                String error = response.getBody() != null ? response.getBody().errorMessage : "Error desconocido";
+                System.out.println("❌ Error de API: " + error);
+                redirectAttributes.addFlashAttribute("errorMessage", "Error al registrar: " + error);
+                return "redirect:/usuario/formulario";
+            }
+
+        } catch (IOException ex) {
+            System.out.println("❌ Error procesando imagen: " + ex.getMessage());
+            ex.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar la imagen: " + ex.getMessage());
+            return "redirect:/usuario/formulario";
+        } catch (Exception ex) {
+            System.out.println("❌ Error general: " + ex.getMessage());
+            ex.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar: " + ex.getMessage());
             return "redirect:/usuario/formulario";
         }
-        
-    } catch (Exception ex) {
-        ex.printStackTrace();
-        redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar: " + ex.getMessage());
-        return "redirect:/usuario/formulario";
     }
-}
-
 
     @GetMapping("cargaMasiva")
     public String CargaMasiva() {
@@ -489,4 +516,3 @@ public String Add(
         return "CargaMasiva";
     }
 }
-  
