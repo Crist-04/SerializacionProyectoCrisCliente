@@ -140,8 +140,7 @@
             <h3>Registro de Usuario</h3>
             <p class="form-subtitle">Complete todos los campos para registrar un nuevo usuario</p>
 
-            <form th:object="${Usuario}" th:action="@{add}" method="post" enctype="multipart/form-data">
-
+<form th:object="${usuario}" th:action="@{/usuario/add}" method="post" enctype="multipart/form-data">
                 <div class="section-title">
                     <i class="bi bi-person-circle"></i>
                     Información Personal
@@ -245,12 +244,14 @@
                         <span th:if="${#fields.hasErrors('Password')}" th:errors='*{password}' class="text-danger"></span>
                     </div>
                     <div class="col-md-4">
-                        <label for="nombreRol" class="form-label required-field">Rol</label>
-                        <select class="form-select" id="nombreRol" th:field="*{rol.idRol}">
-                            <option value="0" selected>Selecciona un rol</option>
-                            <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombreRol}"></option>
-                        </select>
-                    </div>
+    <label for="nombreRol" class="form-label required-field">Rol</label>
+    <select class="form-select" id="nombreRol" th:field="*{rol.idRol}">
+        <option value="0" selected>Selecciona un rol</option>
+        <option th:each="rol : ${roles}" 
+                th:value="${rol.idRol}" 
+                th:text="${rol.nombre}"></option>  
+    </select>
+</div>
                 </div>
 
                 <div class="section-title">
@@ -259,51 +260,56 @@
                 </div>
                 
                 <div class="row g-3 mt-2">
-                    <div class="col-md-4">
-                        <label for="calle" class="form-label required-field">Calle</label>
-                        <input type="text" class="form-control" id="calle" th:field="*{direcciones[0].calle}" placeholder="Ej: Av. Insurgentes">
-                    </div>      
-                    <div class="col-md-4">
-                        <label for="ddlpais" class="form-label required-field">País</label>
-                        <select class="form-select" id="ddlpais">
-                            <option value="0" selected>Selecciona tu País</option>
-                            <option value="1">México</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="ddlestado" class="form-label required-field">Estado</label>
-                        <select class="form-select" id="ddlestado">
-                            <option value="0" selected>Selecciona tu Estado</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="ddlmunicipio" class="form-label required-field">Municipio</label>
-                        <select class="form-select" id="ddlmunicipio">
-                            <option value="0" selected>Selecciona tu Municipio</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="ddlcolonia" class="form-label required-field">Colonia</label>
-                        <select class="form-select" id="ddlcolonia" th:field="*{direcciones[0].colonia.idColonia}">
-                            <option value="0" selected>Selecciona tu Colonia</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="codigoPostal" class="form-label">Código Postal</label>
-                        <input type="text" class="form-control" id="codigoPostal" placeholder="Se llenará automáticamente" readonly>
-                    </div>
-                </div> 
-                
-                <div class="row g-3 mt-2">
-                    <div class="col-md-6">
-                        <label for="numeroExterior" class="form-label required-field">Número Exterior</label>
-                        <input type="text" class="form-control" id="numeroExterior" th:field="*{direcciones[0].numeroExterior}" placeholder="Ej: 123">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="numeroInterior" class="form-label">Número Interior</label>
-                        <input type="text" class="form-control" id="numeroInterior" th:field="*{direcciones[0].numeroInterior}" placeholder="Ej: 4B">
-                    </div>
-                </div>
+    <div class="col-md-4">
+        <label for="calle" class="form-label required-field">Calle</label>
+        <input type="text" class="form-control" id="calle" 
+               th:field="*{direccionesJPA[0].calle}" placeholder="Ej: Av. Insurgentes">
+    </div>      
+    <div class="col-md-4">
+        <label for="ddlpais" class="form-label required-field">País</label>
+        <select class="form-select" id="ddlpais">
+            <option value="0" selected>Selecciona tu País</option>
+            <option value="1">México</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="ddlestado" class="form-label required-field">Estado</label>
+        <select class="form-select" id="ddlestado">
+            <option value="0" selected>Selecciona tu Estado</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="ddlmunicipio" class="form-label required-field">Municipio</label>
+        <select class="form-select" id="ddlmunicipio">
+            <option value="0" selected>Selecciona tu Municipio</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="ddlcolonia" class="form-label required-field">Colonia</label>
+        <select class="form-select" id="ddlcolonia" 
+                th:field="*{direccionesJPA[0].colonia.idColonia}">
+            <option value="0" selected>Selecciona tu Colonia</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="codigoPostal" class="form-label">Código Postal</label>
+        <input type="text" class="form-control" id="codigoPostal" 
+               placeholder="Se llenará automáticamente" readonly>
+    </div>
+</div> 
+
+<div class="row g-3 mt-2">
+    <div class="col-md-6">
+        <label for="numeroExterior" class="form-label required-field">Número Exterior</label>
+        <input type="text" class="form-control" id="numeroExterior" 
+               th:field="*{direccionesJPA[0].numeroExterior}" placeholder="Ej: 123">
+    </div>
+    <div class="col-md-6">
+        <label for="numeroInterior" class="form-label">Número Interior</label>
+        <input type="text" class="form-control" id="numeroInterior" 
+               th:field="*{direccionesJPA[0].numeroInterior}" placeholder="Ej: 4B">
+    </div>
+</div>
 
                 <div class="row mt-4">
                     <div class="col-12">
@@ -332,117 +338,169 @@
     
     <!-- Scripts específicos de esta página -->
     <th:block layout:fragment="extra-scripts">
-        <script>
-            $(document).ready(function () {
-                console.log("Scripts cargados correctamente");
+    <script>
+        // Función auxiliar para obtener propiedades (maneja diferentes formatos de respuesta)
+        function getPropertyValue(obj, propName) {
+            return obj[propName] || obj[propName.charAt(0).toUpperCase() + propName.slice(1)];
+        }
 
-                // Cargar estados al seleccionar país
-                $("#ddlpais").change(function () {
+        $(document).ready(function () {
+            console.log("Scripts cargados correctamente");
+
+            // Cargar estados al seleccionar país
+            $("#ddlpais").change(function () {
+                const idPais = $(this).val();
+                console.log("País seleccionado:", idPais);
+                
+                if (idPais != "0") {
                     $.ajax({
                         type: 'GET',
-                        url: "/usuario/estado/" + $("#ddlpais").val(),
+                        url: "/usuario/estado/" + idPais,
                         datatype: "json",
                         success: function (data) {
+                            console.log("Estados recibidos:", data);
                             $("#ddlestado").empty();
-                            $("#ddlestado").append("<option value=0 selected>Selecciona un estado</option>");
-                            $.each(data.objects, function (i, estado) {
-                                $("#ddlestado").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>");
+                            $("#ddlestado").append("<option value='0' selected>Selecciona un estado</option>");
+                            
+                            // Manejar tanto data.objects como data.object
+                            const estados = data.objects || data.object || [];
+                            $.each(estados, function (i, estado) {
+                                const idEstado = getPropertyValue(estado, 'idEstado');
+                                const nombre = getPropertyValue(estado, 'nombre');
+                                $("#ddlestado").append("<option value='" + idEstado + "'>" + nombre + "</option>");
                             });
+                            
+                            // Limpiar municipios y colonias
+                            $("#ddlmunicipio").empty().append("<option value='0'>Selecciona un municipio</option>");
+                            $("#ddlcolonia").empty().append("<option value='0'>Selecciona una colonia</option>");
+                            $("#codigoPostal").val("");
                         },
-                        error: function () {
+                        error: function (xhr, status, error) {
+                            console.error("Error cargando estados:", error);
                             alert("No se pudieron cargar los estados");
                         }
                     });
-                });
+                }
+            });
 
-                // Cargar municipios al seleccionar estado
-                $("#ddlestado").change(function () {
+            // Cargar municipios al seleccionar estado
+            $("#ddlestado").change(function () {
+                const idEstado = $(this).val();
+                console.log("Estado seleccionado:", idEstado);
+                
+                if (idEstado != "0") {
                     $.ajax({
                         type: 'GET',
-                        url: "/usuario/municipio/" + $("#ddlestado").val(),
+                        url: "/usuario/municipio/" + idEstado,
                         datatype: "json",
                         success: function (data) {
+                            console.log("Municipios recibidos:", data);
                             $("#ddlmunicipio").empty();
-                            $("#ddlmunicipio").append("<option value=0 selected>Selecciona un municipio</option>");
-                            $.each(data.objects, function (i, municipio) {
-                                $("#ddlmunicipio").append("<option value=" + municipio.idMunicipio + ">" + municipio.nombre + "</option>");
+                            $("#ddlmunicipio").append("<option value='0' selected>Selecciona un municipio</option>");
+                            
+                            const municipios = data.objects || data.object || [];
+                            $.each(municipios, function (i, municipio) {
+                                const idMunicipio = getPropertyValue(municipio, 'idMunicipio');
+                                const nombre = getPropertyValue(municipio, 'nombre');
+                                $("#ddlmunicipio").append("<option value='" + idMunicipio + "'>" + nombre + "</option>");
                             });
+                            
+                            // Limpiar colonias
+                            $("#ddlcolonia").empty().append("<option value='0'>Selecciona una colonia</option>");
+                            $("#codigoPostal").val("");
                         },
-                        error: function () {
+                        error: function (xhr, status, error) {
+                            console.error("Error cargando municipios:", error);
                             alert("No se pudieron cargar los municipios");
                         }
                     });
-                });
+                }
+            });
 
-                // Cargar colonias al seleccionar municipio
-                $("#ddlmunicipio").change(function () {
+            // Cargar colonias al seleccionar municipio
+            $("#ddlmunicipio").change(function () {
+                const idMunicipio = $(this).val();
+                console.log("Municipio seleccionado:", idMunicipio);
+                
+                if (idMunicipio != "0") {
                     $.ajax({
                         type: 'GET',
-                        url: "/usuario/colonia/" + $("#ddlmunicipio").val(),
+                        url: "/usuario/colonia/" + idMunicipio,
                         datatype: "json",
                         success: function (data) {
+                            console.log("Colonias recibidas:", data);
                             $("#ddlcolonia").empty();
-                            $("#ddlcolonia").append("<option value=0 selected>Selecciona una Colonia</option>");
-                            $.each(data.objects, function (i, colonia) {
-                                $("#ddlcolonia").append("<option value=" + colonia.idColonia + ">" + colonia.nombre + "</option>");
+                            $("#ddlcolonia").append("<option value='0' selected>Selecciona una Colonia</option>");
+                            
+                            const colonias = data.objects || data.object || [];
+                            // Guardar colonias para acceder al código postal
+                            window.coloniasCargadas = colonias;
+                            
+                            $.each(colonias, function (i, colonia) {
+                                const idColonia = getPropertyValue(colonia, 'idColonia');
+                                const nombre = getPropertyValue(colonia, 'nombre');
+                                $("#ddlcolonia").append("<option value='" + idColonia + "'>" + nombre + "</option>");
                             });
+                            
+                            $("#codigoPostal").val("");
                         },
-                        error: function () {
+                        error: function (xhr, status, error) {
+                            console.error("Error cargando colonias:", error);
                             alert("No se pudieron cargar las colonias");
                         }
                     });
-                });
-
-                // Cargar código postal al seleccionar colonia
-                $("#ddlcolonia").on('blur change', function () {
-                    var idColonia = $(this).val();
-
-                    if (idColonia == "0" || !idColonia) {
-                        $("#codigoPostal").val("");
-                        return;
-                    }
-
-                    $.ajax({
-                        type: 'GET',
-                        url: "/usuario/codigopostal/" + idColonia,
-                        datatype: "json",
-                        success: function (data) {
-                            if (data.correct && data.object && data.object.codigoPostal) {
-                                $("#codigoPostal").val(data.object.codigoPostal);
-                            } else {
-                                $("#codigoPostal").val("");
-                            }
-                        },
-                        error: function () {
-                            alert("No se pudo cargar el código postal");
-                        }
-                    });
-                });
-
-                // Validación de fecha
-                let hoy = new Date().toISOString().split('T')[0];
-                $("#fechaNacimiento").attr('max', hoy);
+                }
             });
 
-            function ValidarFecha(input) {
-                let fechaSeleccionada = new Date($(input).val());
-                let fechaActual = new Date();
+            // Cargar código postal al seleccionar colonia
+            $("#ddlcolonia").change(function () {
+                const idColonia = parseInt($(this).val());
+                console.log("Colonia seleccionada:", idColonia);
 
-                fechaActual.setHours(0, 0, 0, 0);
-                fechaSeleccionada.setHours(0, 0, 0, 0);
+                if (idColonia != "0" && window.coloniasCargadas) {
+                    // Buscar la colonia en los datos cargados
+                    const coloniaSeleccionada = window.coloniasCargadas.find(c => {
+                        const id = getPropertyValue(c, 'idColonia');
+                        return id == idColonia;
+                    });
 
-                if ($(input).val() === "") {
-                    $(input).removeClass("error").removeClass("correct");
-                    $(input).siblings(".error-msg-fecha").text("");
-                } else if (fechaSeleccionada > fechaActual) {
-                    $(input).removeClass("correct").addClass("error");
-                    $(input).siblings(".error-msg-fecha").text("La fecha no puede ser mayor a la fecha actual");
+                    console.log("Colonia encontrada:", coloniaSeleccionada);
+
+                    if (coloniaSeleccionada) {
+                        const cp = getPropertyValue(coloniaSeleccionada, 'codigoPostal');
+                        $("#codigoPostal").val(cp || "");
+                    } else {
+                        $("#codigoPostal").val("");
+                    }
                 } else {
-                    $(input).removeClass("error").addClass("correct");
-                    $(input).siblings(".error-msg-fecha").text("");
+                    $("#codigoPostal").val("");
                 }
+            });
+
+            // Validación de fecha
+            let hoy = new Date().toISOString().split('T')[0];
+            $("#fechaNacimiento").attr('max', hoy);
+        });
+
+        function ValidarFecha(input) {
+            let fechaSeleccionada = new Date($(input).val());
+            let fechaActual = new Date();
+
+            fechaActual.setHours(0, 0, 0, 0);
+            fechaSeleccionada.setHours(0, 0, 0, 0);
+
+            if ($(input).val() === "") {
+                $(input).removeClass("error").removeClass("correct");
+                $(input).siblings(".error-msg-fecha").text("");
+            } else if (fechaSeleccionada > fechaActual) {
+                $(input).removeClass("correct").addClass("error");
+                $(input).siblings(".error-msg-fecha").text("La fecha no puede ser mayor a la fecha actual");
+            } else {
+                $(input).removeClass("error").addClass("correct");
+                $(input).siblings(".error-msg-fecha").text("");
             }
-        </script>
-    </th:block>
+        }
+    </script>
+</th:block>
 </body>
 </html>

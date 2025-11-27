@@ -393,9 +393,87 @@ public String updateDireccion(
 
 
     @GetMapping("formulario")
-    public String UsuarioForm() {
-        return "UsuarioForm";
+public String UsuarioForm(Model model) {
+    Usuario usuario = new Usuario();
+    
+    // Inicializar lista de direcciones
+    ArrayList<Direccion> direcciones = new ArrayList<>();
+    direcciones.add(new Direccion());
+    usuario.setDireccionesJPA(direcciones);
+    
+    model.addAttribute("usuario", usuario);
+    
+    // Cargar roles
+    try {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Result<List<Rol>>> response = restTemplate.exchange(
+            urlBase + "/api/rol",
+            HttpMethod.GET,
+            HttpEntity.EMPTY,
+            new ParameterizedTypeReference<Result<List<Rol>>>() {}
+        );
+        
+        if (response.getBody() != null) {
+            Result result = response.getBody();
+            // Intenta con objects o object
+            List<Rol> roles = result.objects != null ? result.objects : (List<Rol>)result.object;
+            model.addAttribute("roles", roles != null ? roles : new ArrayList<>());
+            
+            System.out.println("=== ROLES CARGADOS: " + (roles != null ? roles.size() : "null") + " ===");
+        }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        model.addAttribute("roles", new ArrayList<>());
     }
+    
+    return "UsuarioForm";
+}
+
+
+@PostMapping("/add")
+public String Add(
+        @ModelAttribute("usuario") Usuario usuario,
+        @RequestParam(value = "foto", required = false) MultipartFile foto,
+        RedirectAttributes redirectAttributes) {
+    
+    try {
+        // Procesar foto si existe
+        if (foto != null && !foto.isEmpty()) {
+            byte[] imagenBytes = foto.getBytes();
+            String imagenBase64 = Base64.getEncoder().encodeToString(imagenBytes);
+            usuario.setImagen(imagenBase64);
+        }
+        
+        System.out.println("=== ENVIANDO USUARIO A API ===");
+        System.out.println("Nombre: " + usuario.getNombre());
+        System.out.println("Email: " + usuario.getEmail());
+        
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<Usuario> body = new HttpEntity<>(usuario);
+        
+        ResponseEntity<Result<Usuario>> response = restTemplate.exchange(
+            urlBase + "/api/usuario",
+            HttpMethod.POST,
+            body,
+            new ParameterizedTypeReference<Result<Usuario>>() {}
+        );
+        
+        if (response.getBody() != null && response.getBody().correct) {
+            redirectAttributes.addFlashAttribute("successMessage", "Usuario registrado exitosamente");
+            return "redirect:/usuario";
+        } else {
+            String error = response.getBody() != null ? response.getBody().errorMessage : "Error desconocido";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al registrar: " + error);
+            return "redirect:/usuario/formulario";
+        }
+        
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar: " + ex.getMessage());
+        return "redirect:/usuario/formulario";
+    }
+}
+
 
     @GetMapping("cargaMasiva")
     public String CargaMasiva() {
