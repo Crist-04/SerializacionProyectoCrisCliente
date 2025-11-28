@@ -67,6 +67,9 @@ public class Usuario {
 //    @Pattern(regexp = "^\\+?([0-9]{2,3})?[0-9]{10}$", message = "Ingresa correctamente tu numero de telefono")
     @JsonProperty("Telefono")
     private String telefono;
+    
+    @JsonProperty("Estatus")
+    private Integer Estatus;
 
 //    @NotNull(message = "El CURP no puede ser nulo")
 //    @NotBlank(message = "El CURP no puede estar vacío")
@@ -235,5 +238,16 @@ public void setDireccionesJPA(ArrayList<Direccion> direccionesJPA) {
     public void setImagen(String Imagen) {
         this.Imagen = Imagen;
     }
+
+    public Integer getEstatus() {
+        return Estatus;
+    }
+
+    
+    public void setEstatus(Integer Estatus) {
+        this.Estatus = Estatus;
+    }
+    
+    
 
 }

@@ -35,6 +35,13 @@
                 opacity: 0.9;
             }
 
+            /* Estilos para el buscador */
+            .search-bar {
+                background: white;
+                padding: 20px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
             table {
                 border-radius: 10px;
                 overflow: hidden;
@@ -66,6 +73,25 @@
             .btn-danger:hover {
                 background-color: #d62828;
             }
+            
+            .status {
+                display: inline-flex;
+                align-items: center;
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                color: white;
+            }
+
+            .activo {
+                background-color: #28a745;
+            }
+
+            .inactivo {
+                background-color: #dc3545;
+            }
+
 
             .avatar {
                 width: 40px;
@@ -96,6 +122,66 @@
                 font-size: 0.75rem;
                 font-weight: 500;
             }
+
+            /* Estilos para el toggle switch */
+            .toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+            }
+
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 24px;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            input:checked + .slider {
+                background-color: #4CAF50;
+            }
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+            .status-label {
+                margin-top: 5px;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .status-label.activo {
+                color: #4CAF50;
+            }
+
+            .status-label.inactivo {
+                color: #f44336;
+            }
         </style>
     </th:block>
 </head>
@@ -107,14 +193,52 @@
                 <h2><i class="bi bi-people-fill me-2"></i>Usuarios</h2>
                 <p>Listado general de usuarios registrados.</p>
             </div>
-            
+
             <div class="search-bar">
-    <div class="col text-center">
-        <button type="button" class="btn btn-primary" onclick="window.location.href = '/usuario/formulario'">
-            <i class="bi bi-person-plus-fill"></i> Agregar Nuevo Usuario
-        </button>
-    </div>
-</div>
+                <form method="post" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Apellido Paterno</label>
+                        <input type="text" name="apellidoPaterno" class="form-control" placeholder="Ap. Paterno">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Apellido Materno</label>
+                        <input type="text" name="apellidoMaterno" class="form-control" placeholder="Ap. Materno">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Rol</label>
+                        <select name="idRol" class="form-control">
+                            <option value="0">Todos</option>
+                            <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombre}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 text-start">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-1 text-start">
+                        <a href="/usuario" class="btn btn-secondary w-100" title="Limpiar búsqueda">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    </div>
+                </form>
+                <div class="row mt-3">
+                    <div class="col text-center">
+                        <button type="button" class="btn btn-primary" onclick="window.location.href = '/usuario/formulario'">
+                            <i class="bi bi-person-plus-fill"></i> Agregar Nuevo Usuario
+                        </button>
+                    </div>
+                    <div class="col text-center">
+                        <button type="button" class="btn btn-dark" onclick="window.location.href = '/usuario/cargaMasiva'">
+                            <i class="bi bi-upload"></i> Cargas Masivas
+                        </button>
+                    </div>
+                </div>
+            </div>
 
 
             <div class="p-3" style="max-height: 400px; overflow-y: auto;">
@@ -125,7 +249,8 @@
                             <th>Usuario</th>
                             <th>Datos de contacto</th>
                             <th>Rol</th>
-                            <th>Direcciones</th>                       
+                            <th>Direcciones</th>
+                            <th>Estatus</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -164,28 +289,43 @@
                                 <span th:text="${usuario.rol != null ? usuario.rol.nombre : 'Sin rol'}"></span>
                             </td>
                             <td class="text-start">
-    <div th:if="${usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()}">
-        <div th:each="direccion, iterStat : ${usuario.direccionesJPA}" class="direccion-item">
-            <span class="badge-direccion" th:text="'Dir. ' + ${iterStat.count}">Dir. 1</span>
-            <div class="mt-1">
-                <i class="bi bi-geo-alt-fill text-danger me-1"></i>
-                <small>
-                    <strong th:text="${direccion.calle} + ' #' + ${direccion.numeroExterior}">Calle y número</strong>
-                    <span th:if="${direccion.numeroInterior != null && !direccion.numeroInterior.isEmpty()}" 
-                          th:text="' Int. ' + ${direccion.numeroInterior}"></span>
-                </small>
-                <!-- Si quieres mostrar la colonia: -->
-                <div th:if="${direccion.colonia != null}">
-                    <span th:text="${direccion.colonia.nombre}"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div th:if="${usuario.direccionesJPA == null || usuario.direccionesJPA.isEmpty()}" class="text-muted">
-        <i class="bi bi-x-circle me-1"></i>
-        <small>Sin direcciones registradas</small>
-    </div>
-</td>                      
+                                <div th:if="${usuario.direccionesJPA != null && !usuario.direccionesJPA.isEmpty()}">
+                                    <div th:each="direccion, iterStat : ${usuario.direccionesJPA}" class="direccion-item">
+                                        <span class="badge-direccion" th:text="'Dir. ' + ${iterStat.count}">Dir. 1</span>
+                                        <div class="mt-1">
+                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                            <small>
+                                                <strong th:text="${direccion.calle} + ' #' + ${direccion.numeroExterior}">Calle y número</strong>
+                                                <span th:if="${direccion.numeroInterior != null && !direccion.numeroInterior.isEmpty()}" 
+                                                      th:text="' Int. ' + ${direccion.numeroInterior}"></span>
+                                            </small>
+                                            <div th:if="${direccion.colonia != null}">
+                                                <span th:text="${direccion.colonia.nombre}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:if="${usuario.direccionesJPA == null || usuario.direccionesJPA.isEmpty()}" class="text-muted">
+                                    <i class="bi bi-x-circle me-1"></i>
+                                    <small>Sin direcciones registradas</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column align-items-center">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" 
+                                               th:checked="${usuario.estatus == 1}"
+                                               th:data-usuario-id="${usuario.idUsuario}"
+                                               onchange="cambiarEstatus(this)">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <small class="status-label" 
+                                           th:classappend="${usuario.estatus == 1} ? 'activo' : 'inactivo'"
+                                           th:text="${usuario.estatus == 1} ? 'Activo' : 'Inactivo'">
+                                        Activo
+                                    </small>
+                                </div>
+                            </td>
                         </tr> 
                     </tbody>
                 </table>
@@ -194,6 +334,75 @@
     </div>
 
 <th:block layout:fragment="extra-scripts">
+    <script>
+        function cambiarEstatus(checkbox) {
+            const usuarioId = checkbox.getAttribute('data-usuario-id');
+            const nuevoEstatus = checkbox.checked ? 1 : 0;
+            const statusLabel = checkbox.closest('td').querySelector('.status-label');
+
+            // Confirmación con SweetAlert2
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: nuevoEstatus === 1 ?
+                        '¿Deseas activar este usuario?' :
+                        '¿Deseas desactivar este usuario? No podrá iniciar sesión.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cambiar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Realizar petición AJAX para cambiar el estatus
+                    fetch(`/usuario/cambiarEstatus/${usuarioId}/${nuevoEstatus}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                            .then(response => {
+                                if (response.ok) {
+                                    // Actualizar el texto del label
+                                    if (nuevoEstatus === 1) {
+                                        statusLabel.textContent = 'Activo';
+                                        statusLabel.classList.remove('inactivo');
+                                        statusLabel.classList.add('activo');
+                                    } else {
+                                        statusLabel.textContent = 'Inactivo';
+                                        statusLabel.classList.remove('activo');
+                                        statusLabel.classList.add('inactivo');
+                                    }
+
+                                    Swal.fire({
+                                        title: '¡Actualizado!',
+                                        text: 'El estatus del usuario ha sido cambiado.',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    throw new Error('Error al cambiar el estatus');
+                                }
+                            })
+                            .catch(error => {
+                                // Revertir el checkbox si hay error
+                                checkbox.checked = !checkbox.checked;
+
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'No se pudo cambiar el estatus del usuario.',
+                                    icon: 'error'
+                                });
+                            });
+                } else {
+                    // Revertir el checkbox si cancela
+                    checkbox.checked = !checkbox.checked;
+                }
+            });
+        }
+    </script>
+
     <script th:if="${successMessage}" th:inline="javascript">
         Swal.fire({
             title: [[${successMessage}]],

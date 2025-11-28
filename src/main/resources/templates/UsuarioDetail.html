@@ -364,243 +364,253 @@
                     <div class="user-avatar" th:if="${usuario.Imagen == null || usuario.Imagen.isEmpty()}">
                         <i class="bi bi-person-fill"></i>
                     </div>
-                    <div class="user-name" id="displayName" th:text="${usuario.nombre + ' ' + usuario.apellidoPaterno + ' ' + usuario.apellidoMaterno}">
-                        Nombre Completo
+                    <div class="text-center mb-3" id="imagenActualizada" style="display: none;">
+                        <label for="fotoUpdate" class="form-label">
+                            <i class="bi bi-camera-fil"></i> Cambiar Foto
+                        </label>
                     </div>
-                    <div class="user-role">
-                        <span class="badge bg-primary" id="displayRole" th:text="${usuario.rol.nombre}">Rol</span>
-                    </div>
+                    <input type="file" class="form-control" id="fotoUpdate" 
+                           accept="image/jpeg,image/png,image/jpg" 
+                           onchange="previewImage(this)">
+                    <small class="text-muted">Formatos: JPG, PNG. Máx 2MB</small>
+                </div>
+                <div class="user-name" id="displayName" th:text="${usuario.nombre + ' ' + usuario.apellidoPaterno + ' ' + usuario.apellidoMaterno}">
+                    Nombre Completo
+                </div>
+                <div class="user-role">
+                    <span class="badge bg-primary" id="displayRole" th:text="${usuario.rol.nombre}">Rol</span>
+                </div>
 
-                    <div class="text-center mb-3">
-                        <button type="button" class="btn btn-primary-custom btn-custom" onclick="toggleInfo()">
-                            <i class="bi bi-eye" id="toggleIcon"></i>
-                            <span id="toggleText">Mostrar Información Completa</span>
-                        </button>
-                    </div>
+                <div class="text-center mb-3">
+                    <button type="button" class="btn btn-primary-custom btn-custom" onclick="toggleInfo()">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                        <span id="toggleText">Mostrar Información Completa</span>
+                    </button>
+                </div>
 
-                    <div class="info-section" id="infoSection">
-                        <hr class="my-4">
+                <div class="info-section" id="infoSection">
+                    <hr class="my-4">
 
-                        <h5 class="mb-3" style="color: #667eea; font-weight: 600;">
-                            <i class="bi bi-person-lines-fill"></i> Datos Personales
-                        </h5>
+                    <h5 class="mb-3" style="color: #667eea; font-weight: 600;">
+                        <i class="bi bi-person-lines-fill"></i> Datos Personales
+                    </h5>
 
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-person"></i>
-                                <span>Nombre:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="text" class="form-control" name="nombre" 
-                                       th:value="${usuario.nombre}" disabled id="nombre">
-                            </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-person"></i>
+                            <span>Nombre:</span>
                         </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-person"></i>
-                                <span>Apellido Paterno:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="text" class="form-control" name="apellidoPaterno" 
-                                       th:value="${usuario.apellidoPaterno}" disabled id="apellidoPaterno">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-person"></i>
-                                <span>Apellido Materno:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="text" class="form-control" name="apellidoMaterno" 
-                                       th:value="${usuario.apellidoMaterno}" disabled id="apellidoMaterno">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-person-badge"></i>
-                                <span>Username:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="text" class="form-control" name="userName" 
-                                       th:value="${usuario.userName}" disabled id="userName">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-credit-card"></i>
-                                <span>CURP:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="text" class="form-control" name="CURP" 
-                                       th:value="${usuario.CURP}" disabled id="CURP" maxlength="18">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-calendar-event"></i>
-                                <span>Fecha de Nacimiento:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="date" class="form-control" name="fechaNacimiento" 
-                                       th:value="${usuario.fechaNacimiento}" disabled id="fechaNacimiento">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-gender-ambiguous"></i>
-                                <span>Sexo:</span>
-                            </div>
-                            <div class="info-value">
-                                <select class="form-select" name="sexo" disabled id="sexo">
-                                    <option value="M" th:selected="${usuario.sexo == 'M'}">Masculino</option>
-                                    <option value="F" th:selected="${usuario.sexo == 'F'}">Femenino</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <h5 class="mb-3 mt-4" style="color: #667eea; font-weight: 600;">
-                            <i class="bi bi-telephone-fill"></i> Datos de Contacto
-                        </h5>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-envelope"></i>
-                                <span>Email:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="email" class="form-control" name="Email" 
-                                       th:value="${usuario.Email}" disabled id="Email">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-telephone"></i>
-                                <span>Teléfono:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="tel" class="form-control" name="telefono" 
-                                       th:value="${usuario.telefono}" disabled id="telefono" maxlength="10">
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-phone"></i>
-                                <span>Celular:</span>
-                            </div>
-                            <div class="info-value">
-                                <input type="tel" class="form-control" name="Celular" 
-                                       th:value="${usuario.Celular}" disabled id="Celular" maxlength="10">
-                            </div>
-                        </div>
-
-                        <h5 class="mb-3 mt-4" style="color: #667eea; font-weight: 600;">
-                            <i class="bi bi-shield-check"></i> Datos de Cuenta
-                        </h5>
-
-                        <div class="info-row">
-                            <div class="info-label">
-                                <i class="bi bi-person-badge-fill"></i>
-                                <span>Rol:</span>
-                            </div>
-                            <div class="info-value">
-                                <select class="form-select" name="rol.idRol" disabled id="rol">
-                                    <option value="1" th:selected="${usuario.rol.idRol == 1}">Administrador</option>
-                                    <option value="2" th:selected="${usuario.rol.idRol == 2}">Usuario</option>
-                                    <option value="3" th:selected="${usuario.rol.idRol == 3}">Cliente</option>
-                                    <option value="4" th:selected="${usuario.rol.idRol == 4}">Rol5</option>
-                                </select>
-                            </div>
+                        <div class="info-value">
+                            <input type="text" class="form-control" name="nombre" 
+                                   th:value="${usuario.nombre}" disabled id="nombre">
                         </div>
                     </div>
 
-                    <div class="action-buttons mt-4">
-                        <button type="button" class="btn btn-warning-custom btn-custom" id="editBtn" onclick="toggleEdit()">
-                            <i class="bi bi-pencil-square"></i> <span id="editBtnText">Editar Usuario</span>
-                        </button>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-person"></i>
+                            <span>Apellido Paterno:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="text" class="form-control" name="apellidoPaterno" 
+                                   th:value="${usuario.apellidoPaterno}" disabled id="apellidoPaterno">
+                        </div>
+                    </div>
 
-                        <button type="submit" class="btn btn-success-custom btn-custom" id="saveBtn" style="display: none;">
-                            <i class="bi bi-check-circle"></i> Guardar Cambios
-                        </button>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-person"></i>
+                            <span>Apellido Materno:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="text" class="form-control" name="apellidoMaterno" 
+                                   th:value="${usuario.apellidoMaterno}" disabled id="apellidoMaterno">
+                        </div>
+                    </div>
 
-                        <button type="button" class="btn btn-secondary-custom btn-custom" onclick="window.location.href = '/usuario'">
-                            <i class="bi bi-arrow-left-circle"></i> Volver al Listado
-                        </button>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Username:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="text" class="form-control" name="userName" 
+                                   th:value="${usuario.userName}" disabled id="userName">
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-credit-card"></i>
+                            <span>CURP:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="text" class="form-control" name="CURP" 
+                                   th:value="${usuario.CURP}" disabled id="CURP" maxlength="18">
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Fecha de Nacimiento:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="date" class="form-control" name="fechaNacimiento" 
+                                   th:value="${usuario.fechaNacimiento}" disabled id="fechaNacimiento">
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-gender-ambiguous"></i>
+                            <span>Sexo:</span>
+                        </div>
+                        <div class="info-value">
+                            <select class="form-select" name="sexo" disabled id="sexo">
+                                <option value="M" th:selected="${usuario.sexo == 'M'}">Masculino</option>
+                                <option value="F" th:selected="${usuario.sexo == 'F'}">Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3 mt-4" style="color: #667eea; font-weight: 600;">
+                        <i class="bi bi-telephone-fill"></i> Datos de Contacto
+                    </h5>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-envelope"></i>
+                            <span>Email:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="email" class="form-control" name="Email" 
+                                   th:value="${usuario.Email}" disabled id="Email">
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-telephone"></i>
+                            <span>Teléfono:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="tel" class="form-control" name="telefono" 
+                                   th:value="${usuario.telefono}" disabled id="telefono" maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-phone"></i>
+                            <span>Celular:</span>
+                        </div>
+                        <div class="info-value">
+                            <input type="tel" class="form-control" name="Celular" 
+                                   th:value="${usuario.Celular}" disabled id="Celular" maxlength="10">
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3 mt-4" style="color: #667eea; font-weight: 600;">
+                        <i class="bi bi-shield-check"></i> Datos de Cuenta
+                    </h5>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="bi bi-person-badge-fill"></i>
+                            <span>Rol:</span>
+                        </div>
+                        <div class="info-value">
+                            <select class="form-select" name="rol.idRol" disabled id="rol">
+                                <option value="1" th:selected="${usuario.rol.idRol == 1}">Administrador</option>
+                                <option value="2" th:selected="${usuario.rol.idRol == 2}">Usuario</option>
+                                <option value="3" th:selected="${usuario.rol.idRol == 3}">Cliente</option>
+                                <option value="4" th:selected="${usuario.rol.idRol == 4}">Rol5</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
+
+                <div class="action-buttons mt-4">
+                    <button type="button" class="btn btn-warning-custom btn-custom" id="editBtn" onclick="toggleEdit()">
+                        <i class="bi bi-pencil-square"></i> <span id="editBtnText">Editar Usuario</span>
+                    </button>
+
+                    <button type="submit" class="btn btn-success-custom btn-custom" id="saveBtn" style="display: none;">
+                        <i class="bi bi-check-circle"></i> Guardar Cambios
+                    </button>
+
+                    <button type="button" class="btn btn-secondary-custom btn-custom" onclick="window.location.href = '/usuario'">
+                        <i class="bi bi-arrow-left-circle"></i> Volver al Listado
+                    </button>
+                </div>
             </div>
-        </form>
-
-        <!-- estas son para direcciones -->
-        <div class="card-custom" style="max-height: 459px; overflow-y: auto;">
-            <div class="card-header-custom">
-                <i class="bi bi-geo-alt-fill"></i>
-                <span>Direcciones Registradas</span>
-            </div>
-
-            <div class="text-center mt-3">
-                <button type="button" 
-                        class="btn btn-success-custom btn-custom"
-                        th:onclick="'prepararModalAgregar(' + ${usuario.idUsuario} + ')'">
-                    <i class="bi bi-plus-square-fill"></i> Agregar Dirección
-                </button>
-
-            </div>
-            <div class="card-body-custom">
-
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="col-2">Accion</th>
-                            <th class="col-10">Dirección</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="direccion, iterStat : ${usuario.direccionesJPA}">
-                            <td>
-                                <button type="button" 
-                                        class="btn btn-primary-custom btn-sm btn-editar-dir"
-                                        th:attr="data-id=${direccion.idDireccion},
-                                        data-calle=${direccion.calle},
-                                        data-numeroext=${direccion.numeroExterior},
-                                        data-numeroint=${direccion.numeroInterior},
-                                        data-colonia=${direccion.colonia.idColonia},
-                                        data-municipio=${direccion.colonia.municipio.idMunicipio},
-                                        data-estado=${direccion.colonia.municipio.estado.idEstado},
-                                        data-idusuario=${usuario.idUsuario}"
-                                        onclick="editarDireccion(this)">
-                                    <i class="bi bi-pencil"></i> Editar Dirección
-                                </button>
-
-                                <button type="button" 
-                                        class="btn btn-danger-custom btn-sm"
-                                        th:onclick="'eliminarDireccion(' + ${direccion.idDireccion} + ',' + ${usuario.idUsuario} + ')'">
-                                    <i class="bi bi-trash"></i> 
-                                    <span class="btn-text">Eliminar Dirección</span>
-                                </button>
-
-                            </td>    
-                            <td th:text="|${direccion.calle} ${direccion.numeroInterior}|"></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </div>
-
-            <div th:if="${usuario.direccionesJPA == null or usuario.direccionesJPA.isEmpty()}" class="no-addresses">
-                <i class="bi bi-house-x"></i>
-                <h5>No hay direcciones registradas</h5>
-                <p class="text-muted">Agrega una dirección para este usuario</p>
-            </div>
-        </div>
     </div>
+</form>
+
+<!-- estas son para direcciones -->
+<div class="card-custom" style="max-height: 459px; overflow-y: auto;">
+    <div class="card-header-custom">
+        <i class="bi bi-geo-alt-fill"></i>
+        <span>Direcciones Registradas</span>
+    </div>
+
+    <div class="text-center mt-3">
+        <button type="button" 
+                class="btn btn-success-custom btn-custom"
+                th:onclick="'prepararModalAgregar(' + ${usuario.idUsuario} + ')'">
+            <i class="bi bi-plus-square-fill"></i> Agregar Dirección
+        </button>
+
+    </div>
+    <div class="card-body-custom">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="col-2">Accion</th>
+                    <th class="col-10">Dirección</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="direccion, iterStat : ${usuario.direccionesJPA}">
+                    <td>
+                        <button type="button" 
+                                class="btn btn-primary-custom btn-sm btn-editar-dir"
+                                th:attr="data-id=${direccion.idDireccion},
+                                data-calle=${direccion.calle},
+                                data-numeroext=${direccion.numeroExterior},
+                                data-numeroint=${direccion.numeroInterior},
+                                data-colonia=${direccion.colonia.idColonia},
+                                data-municipio=${direccion.colonia.municipio.idMunicipio},
+                                data-estado=${direccion.colonia.municipio.estado.idEstado},
+                                data-idusuario=${usuario.idUsuario}"
+                                onclick="editarDireccion(this)">
+                            <i class="bi bi-pencil"></i> Editar Dirección
+                        </button>
+
+                        <button type="button" 
+                                class="btn btn-danger-custom btn-sm"
+                                th:onclick="'eliminarDireccion(' + ${direccion.idDireccion} + ',' + ${usuario.idUsuario} + ')'">
+                            <i class="bi bi-trash"></i> 
+                            <span class="btn-text">Eliminar Dirección</span>
+                        </button>
+
+                    </td>    
+                    <td th:text="|${direccion.calle} ${direccion.numeroInterior}|"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div th:if="${usuario.direccionesJPA == null or usuario.direccionesJPA.isEmpty()}" class="no-addresses">
+        <i class="bi bi-house-x"></i>
+        <h5>No hay direcciones registradas</h5>
+        <p class="text-muted">Agrega una dirección para este usuario</p>
+    </div>
+</div>
+</div>
 </div>
 
 
@@ -689,7 +699,7 @@
 <!-- funciones para desbloquear los inputs y botones de direcciones -->
 <th:block layout:fragment="extra-scripts">
     <script>
-        const API_BASE_URL = "http://localhost:8080"; 
+        const API_BASE_URL = "http://localhost:8080";
 
         function editarDireccion(btn) {
             const idDireccion = btn.dataset.id;
@@ -1262,7 +1272,7 @@
 
                 $.ajax({
                     type: "PUT",
-                    url: `${API_BASE_URL}/api/direccion/${idUsuario}`, 
+                    url: `${API_BASE_URL}/api/direccion/${idUsuario}`,
                     contentType: "application/json",
                     data: JSON.stringify(direccionJSON),
                     success: function (response) {
@@ -1277,7 +1287,7 @@
             } else {
                 $.ajax({
                     type: "POST",
-                    url: `${API_BASE_URL}/api/direccion/${idUsuario}`, 
+                    url: `${API_BASE_URL}/api/direccion/${idUsuario}`,
                     contentType: "application/json",
                     data: JSON.stringify(direccionJSON),
                     success: function (response) {
