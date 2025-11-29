@@ -3,6 +3,8 @@ package com.digis01.CAlvarezProgramacionNCapasOctubre2025.DemoController;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.Colonia;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.Direccion;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.ErrorCarga;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.LoginRequest;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.LoginResponse;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.Result;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.Rol;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.Usuario;
@@ -52,6 +54,76 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UsuarioController {
 
     public static final String urlBase = "http://localhost:8080";
+    
+    
+//    @GetMapping("/login")
+//    public String LoginUsuario(){
+//        return "Login";
+//    }
+//    
+//    @PostMapping("/login")
+//public String Login(
+//        @RequestParam("username") String username,
+//        @RequestParam("password") String password,
+//        HttpSession session,
+//        RedirectAttributes redirectAttributes) {
+//    
+//    try {
+//        System.out.println("=== Intentando login ===");
+//        System.out.println("Username: " + username);
+//        
+//        // Crear objeto de petición
+//        LoginRequest loginRequest = new LoginRequest();
+//        loginRequest.setUsername(username);
+//        loginRequest.setPassword(password);
+//        
+//        // Llamar a la API
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpEntity<LoginRequest> body = new HttpEntity<>(loginRequest);
+//        
+//        ResponseEntity<LoginResponse> response = restTemplate.exchange(
+//            urlBase + "/api/login",
+//            HttpMethod.POST,
+//            body,
+//            new ParameterizedTypeReference<LoginResponse>() {}
+//        );
+//        
+//        LoginResponse loginResponse = response.getBody();
+//        
+//        if (loginResponse != null && loginResponse.isCorrect()) {
+//            // ✅ Login exitoso - Guardar datos en sesión
+//            session.setAttribute("token", loginResponse.getToken());
+//            session.setAttribute("username", loginResponse.getUsername());
+//            session.setAttribute("idUsuario", loginResponse.getIdUsuario());
+//            
+//            System.out.println("✅ Login exitoso - Token guardado en sesión");
+//            
+//            redirectAttributes.addFlashAttribute("successMessage", "Bienvenido " + loginResponse.getUsername());
+//            return "redirect:/usuario";
+//            
+//        } else {
+//            // ❌ Login fallido
+//            String mensaje = loginResponse != null ? loginResponse.getMensaje() : "Error desconocido";
+//            redirectAttributes.addFlashAttribute("errorMessage", mensaje);
+//            return "redirect:/usuario/login";
+//        }
+//        
+//    } catch (Exception ex) {
+//        System.out.println("❌ Error en login:");
+//        ex.printStackTrace();
+//        redirectAttributes.addFlashAttribute("errorMessage", "Error al conectar con el servidor");
+//        return "redirect:/usuario/login";
+//    }
+//}
+//
+//// Método para cerrar sesión
+//@GetMapping("/logout")
+//public String Logout(HttpSession session, RedirectAttributes redirectAttributes) {
+//    session.invalidate();
+//    redirectAttributes.addFlashAttribute("successMessage", "Sesión cerrada correctamente");
+//    return "redirect:/usuario/login";
+//}
+//    
 
     @GetMapping
     public String UsuarioIndex(Model model) {
