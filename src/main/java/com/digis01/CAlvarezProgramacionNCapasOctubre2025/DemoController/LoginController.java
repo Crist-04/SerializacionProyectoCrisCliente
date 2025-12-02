@@ -2,6 +2,7 @@ package com.digis01.CAlvarezProgramacionNCapasOctubre2025.DemoController;
 
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.LoginRequest;
 import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.LoginResponse;
+import com.digis01.CAlvarezProgramacionNCapasOctubre2025.ML.Result;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -17,61 +18,65 @@ import org.springframework.http.ResponseEntity;
 @Controller
 @RequestMapping("/")  // ← Raíz de la aplicación
 public class LoginController {
-    
+
     public static final String urlBase = "http://localhost:8080";
-    
+
     @GetMapping("/login")
     public String mostrarLogin() {
         return "Login";
     }
-    
+
     @GetMapping  // ← Redirige desde la raíz al login
     public String inicio() {
         return "redirect:/login";
     }
-    
+
     @PostMapping("/login")
     public String Login(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
-        
+
         try {
             System.out.println("=== Intentando login ===");
             System.out.println("Username: " + username);
-            
+
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(username);
             loginRequest.setPassword(password);
-            
+
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<LoginRequest> body = new HttpEntity<>(loginRequest);
-            
+
             ResponseEntity<LoginResponse> response = restTemplate.postForEntity(
-                urlBase + "/api/login",
-                body,
-                LoginResponse.class
+                    urlBase + "/api/login",
+                    body,
+                    LoginResponse.class
             );
-            
+
             LoginResponse loginResponse = response.getBody();
-            
+
             if (loginResponse != null && loginResponse.isCorrect()) {
                 session.setAttribute("token", loginResponse.getToken());
                 session.setAttribute("username", loginResponse.getUsername());
                 session.setAttribute("idUsuario", loginResponse.getIdUsuario());
+                session.setAttribute("rol", loginResponse.getRol());
                 
+                System.out.println(loginResponse.getToken());
+                
+
                 System.out.println("✅ Login exitoso - Token guardado en sesión");
-                
+
                 redirectAttributes.addFlashAttribute("successMessage", "Bienvenido " + loginResponse.getUsername());
                 return "redirect:/usuario";  // ← Redirige al index de usuarios
-                
+
             } else {
                 String mensaje = loginResponse != null ? loginResponse.getMensaje() : "Error desconocido";
                 redirectAttributes.addFlashAttribute("errorMessage", mensaje);
                 return "redirect:/login";
             }
-            
+
         } catch (Exception ex) {
             System.out.println("❌ Error en login:");
             ex.printStackTrace();
@@ -79,11 +84,27 @@ public class LoginController {
             return "redirect:/login";
         }
     }
-    
+
     @GetMapping("/logout")
     public String Logout(HttpSession session, RedirectAttributes redirectAttributes) {
-        session.invalidate();
-        redirectAttributes.addFlashAttribute("successMessage", "Sesión cerrada correctamente");
+        try {
+            String username = (String) session.getAttribute("username");
+            String token = (String) session.getAttribute("token");
+
+            if (username != null) {
+                System.out.println("LOGOUT");
+                System.out.println("Usuario: " + username);
+                System.out.println("Token " + (token != null ? "SI" : "No"));
+
+            }
+
+            session.invalidate();
+            redirectAttributes.addFlashAttribute("successMessage", "Sesión cerrada correctamente");
+
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Errro al Cerrar Sesion");
+        }
+
         return "redirect:/login";
     }
 }

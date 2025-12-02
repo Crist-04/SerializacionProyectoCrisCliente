@@ -40,6 +40,19 @@
                             <h4 class="mb-0"><i class="bi bi-person-circle"></i> Iniciar Sesión</h4>
                         </div>
                         <div class="card-body p-4">
+                            <!-- Mensaje de éxito (logout) -->
+                            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i> 
+                                <span th:text="${successMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+
+                            <!-- Mensaje de error -->
+                            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> 
+                                <span th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
 
                             <p class="text-center text-muted mb-4">Ingresa tus datos para acceder al sistema</p>
 

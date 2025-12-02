@@ -126,7 +126,14 @@ public class UsuarioController {
 //    
 
     @GetMapping
-    public String UsuarioIndex(Model model) {
+    public String UsuarioIndex(Model model, HttpSession session) {
+        
+        String rol =(String) session.getAttribute("rol");
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+        
+       model.addAttribute("rol", rol);
+       model.addAttribute("idUsuario", idUsuario);
+        
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange(
                 urlBase + "/api/usuario",
@@ -138,7 +145,35 @@ public class UsuarioController {
 
         if (responseEntity.getStatusCode().value() == 200) {
             Result result = responseEntity.getBody();
-            model.addAttribute("usuarios", result.object);
+            
+            List<Usuario> Usuarios = (List<Usuario>) result.object;
+            List<Usuario> usuariosFiltrados = new ArrayList<>();
+            
+            switch(rol.toLowerCase()){
+                case "administrador":
+                    usuariosFiltrados = Usuarios;
+                    System.out.println("Muestra todo" +Usuarios.size());
+                    break;
+                    
+                case "usuario":
+                    usuariosFiltrados = Usuarios;
+                    System.out.println("Muestra todo" +Usuarios.size());
+                    break;
+                    
+                case "cliente":
+                case "rol5":
+                    for (Usuario u : Usuarios) {
+                        if (u.getRol()!= null && u.getRol().getNombre().equalsIgnoreCase(rol)) {
+                            usuariosFiltrados.add(u);
+                        }
+                        
+                    }
+                    System.out.println("Muestra los del mismo Rol" +usuariosFiltrados.size());
+                    break;
+            }
+            
+           // model.addAttribute("usuarios", result.object);
+            model.addAttribute("usuarios", usuariosFiltrados);
 
         } else {
             return "Error";
