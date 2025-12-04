@@ -54,86 +54,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class UsuarioController {
 
     public static final String urlBase = "http://localhost:8080";
-    
-    
-//    @GetMapping("/login")
-//    public String LoginUsuario(){
-//        return "Login";
-//    }
-//    
-//    @PostMapping("/login")
-//public String Login(
-//        @RequestParam("username") String username,
-//        @RequestParam("password") String password,
-//        HttpSession session,
-//        RedirectAttributes redirectAttributes) {
-//    
-//    try {
-//        System.out.println("=== Intentando login ===");
-//        System.out.println("Username: " + username);
-//        
-//        // Crear objeto de petición
-//        LoginRequest loginRequest = new LoginRequest();
-//        loginRequest.setUsername(username);
-//        loginRequest.setPassword(password);
-//        
-//        // Llamar a la API
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpEntity<LoginRequest> body = new HttpEntity<>(loginRequest);
-//        
-//        ResponseEntity<LoginResponse> response = restTemplate.exchange(
-//            urlBase + "/api/login",
-//            HttpMethod.POST,
-//            body,
-//            new ParameterizedTypeReference<LoginResponse>() {}
-//        );
-//        
-//        LoginResponse loginResponse = response.getBody();
-//        
-//        if (loginResponse != null && loginResponse.isCorrect()) {
-//            // ✅ Login exitoso - Guardar datos en sesión
-//            session.setAttribute("token", loginResponse.getToken());
-//            session.setAttribute("username", loginResponse.getUsername());
-//            session.setAttribute("idUsuario", loginResponse.getIdUsuario());
-//            
-//            System.out.println("✅ Login exitoso - Token guardado en sesión");
-//            
-//            redirectAttributes.addFlashAttribute("successMessage", "Bienvenido " + loginResponse.getUsername());
-//            return "redirect:/usuario";
-//            
-//        } else {
-//            // ❌ Login fallido
-//            String mensaje = loginResponse != null ? loginResponse.getMensaje() : "Error desconocido";
-//            redirectAttributes.addFlashAttribute("errorMessage", mensaje);
-//            return "redirect:/usuario/login";
-//        }
-//        
-//    } catch (Exception ex) {
-//        System.out.println("❌ Error en login:");
-//        ex.printStackTrace();
-//        redirectAttributes.addFlashAttribute("errorMessage", "Error al conectar con el servidor");
-//        return "redirect:/usuario/login";
-//    }
-//}
-//
-//// Método para cerrar sesión
-//@GetMapping("/logout")
-//public String Logout(HttpSession session, RedirectAttributes redirectAttributes) {
-//    session.invalidate();
-//    redirectAttributes.addFlashAttribute("successMessage", "Sesión cerrada correctamente");
-//    return "redirect:/usuario/login";
-//}
-//    
 
     @GetMapping
     public String UsuarioIndex(Model model, HttpSession session) {
-        
-        String rol =(String) session.getAttribute("rol");
+
+        String rol = (String) session.getAttribute("rol");
         Integer idUsuario = (Integer) session.getAttribute("idUsuario");
-        
-       model.addAttribute("rol", rol);
-       model.addAttribute("idUsuario", idUsuario);
-        
+
+        model.addAttribute("rol", rol);
+        model.addAttribute("idUsuario", idUsuario);
+
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange(
                 urlBase + "/api/usuario",
@@ -145,34 +75,32 @@ public class UsuarioController {
 
         if (responseEntity.getStatusCode().value() == 200) {
             Result result = responseEntity.getBody();
-            
+
             List<Usuario> Usuarios = (List<Usuario>) result.object;
             List<Usuario> usuariosFiltrados = new ArrayList<>();
-            
-            switch(rol.toLowerCase()){
+
+            switch (rol.toLowerCase()) {
                 case "administrador":
                     usuariosFiltrados = Usuarios;
-                    System.out.println("Muestra todo" +Usuarios.size());
+                    System.out.println("Muestra todo" + Usuarios.size());
                     break;
-                    
+
                 case "usuario":
                     usuariosFiltrados = Usuarios;
-                    System.out.println("Muestra todo" +Usuarios.size());
+                    System.out.println("Muestra todo" + Usuarios.size());
                     break;
-                    
+
                 case "cliente":
                 case "rol5":
                     for (Usuario u : Usuarios) {
-                        if (u.getRol()!= null && u.getRol().getNombre().equalsIgnoreCase(rol)) {
+                        if (u.getRol() != null && u.getRol().getNombre().equalsIgnoreCase(rol)) {
                             usuariosFiltrados.add(u);
                         }
-                        
+
                     }
-                    System.out.println("Muestra los del mismo Rol" +usuariosFiltrados.size());
                     break;
             }
-            
-           // model.addAttribute("usuarios", result.object);
+
             model.addAttribute("usuarios", usuariosFiltrados);
 
         } else {
@@ -185,7 +113,6 @@ public class UsuarioController {
     @GetMapping("/detalle/{idUsuario}")
     public String DetalleUsuario(@PathVariable("idUsuario") int idUsuario, Model model) {
         try {
-            System.out.println("=== Obteniendo usuario con ID: " + idUsuario + " ===");
 
             RestTemplate restTemplate = new RestTemplate();
 
@@ -202,17 +129,11 @@ public class UsuarioController {
             if (responseEntity.getStatusCode().value() == 200) {
                 Result result = responseEntity.getBody();
 
-                System.out.println("Result.correct: " + result.correct);
-
                 if (result.correct && result.object != null) {
                     Usuario usuario = (Usuario) result.object;
 
-                    System.out.println("Usuario encontrado: " + usuario.getNombre());
-                    System.out.println("Direcciones: " + (usuario.getDireccionesJPA() != null ? usuario.getDireccionesJPA().size() : "null"));
-
                     model.addAttribute("usuario", usuario);
 
-                    // Cargar roles para el dropdown
                     ResponseEntity<Result<List<Rol>>> rolesResponse = restTemplate.exchange(
                             urlBase + "/api/rol",
                             HttpMethod.GET,
@@ -225,23 +146,19 @@ public class UsuarioController {
                         model.addAttribute("roles", rolesResponse.getBody().objects);
                     }
 
-                    System.out.println("=== Retornando vista UsuarioDetail ===");
                     return "UsuarioDetail";
 
                 } else {
-                    System.out.println("=== Usuario no encontrado ===");
                     model.addAttribute("errorMessage", "Usuario no encontrado");
                     return "redirect:/usuario";
                 }
 
             } else {
-                System.out.println("=== Error en la respuesta de la API ===");
                 model.addAttribute("errorMessage", "Error al consultar la API");
                 return "redirect:/usuario";
             }
 
         } catch (Exception ex) {
-            System.out.println("=== ERROR en DetalleUsuario ===");
             ex.printStackTrace();
             model.addAttribute("errorMessage", "Error al cargar el detalle: " + ex.getMessage());
             return "redirect:/usuario";
@@ -474,16 +391,14 @@ public class UsuarioController {
         }
     }
 
-    // ✅ CORREGIDO: Endpoint para código postal
     @GetMapping("/codigopostal/{idColonia}")
     @ResponseBody
     public Result getCodigoPostalByColonia(@PathVariable int idColonia) {
         try {
             RestTemplate restTemplate = new RestTemplate();
 
-            // ✅ CORRECCIÓN: Debe buscar la colonia específica, no todas las del municipio
             ResponseEntity<Result> response = restTemplate.exchange(
-                    urlBase + "/api/colonia/" + idColonia, // Endpoint correcto para obtener una colonia
+                    urlBase + "/api/colonia/" + idColonia,
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result>() {
@@ -503,14 +418,12 @@ public class UsuarioController {
     public String UsuarioForm(Model model) {
         Usuario usuario = new Usuario();
 
-        // Inicializar lista de direcciones
         ArrayList<Direccion> direcciones = new ArrayList<>();
         direcciones.add(new Direccion());
         usuario.setDireccionesJPA(direcciones);
 
         model.addAttribute("usuario", usuario);
 
-        // Cargar roles
         try {
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Result<List<Rol>>> response = restTemplate.exchange(
@@ -523,11 +436,9 @@ public class UsuarioController {
 
             if (response.getBody() != null) {
                 Result result = response.getBody();
-                // Intenta con objects o object
                 List<Rol> roles = result.objects != null ? result.objects : (List<Rol>) result.object;
                 model.addAttribute("roles", roles != null ? roles : new ArrayList<>());
 
-                System.out.println("=== ROLES CARGADOS: " + (roles != null ? roles.size() : "null") + " ===");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -549,7 +460,7 @@ public class UsuarioController {
                 String contentType = foto.getContentType();
                 if (contentType == null || !contentType.startsWith("image/")) {
                     redirectAttributes.addFlashAttribute("errorMessage",
-                            "El archivo debe ser una imagen (JPG, PNG, etc.)");
+                            "El archivo debe ser una imagen JPG");
                     return "redirect:/usuario/formulario";
                 }
 
@@ -557,21 +468,9 @@ public class UsuarioController {
                 String imagenBase64 = Base64.getEncoder().encodeToString(imagenBytes);
                 usuario.setImagen(imagenBase64);
 
-                System.out.println(" Imagen procesada:");
-                System.out.println("  - Tipo: " + contentType);
-                System.out.println("  - Tamaño original: " + foto.getSize() + " bytes");
-                System.out.println("  - Base64 length: " + imagenBase64.length() + " caracteres");
             } else {
-                System.out.println("⚠️ No se recibió imagen");
+                System.out.println("No se recibió imagen");
             }
-
-            System.out.println("\n=== ENVIANDO USUARIO A API ===");
-            System.out.println("Nombre: " + usuario.getNombre());
-            System.out.println("UserName: " + usuario.getUserName());
-            System.out.println("Email: " + usuario.getEmail());
-            System.out.println("Imagen presente: " + (usuario.getImagen() != null ? "SÍ" : "NO"));
-            System.out.println("Rol ID: " + (usuario.getRol() != null ? usuario.getRol().getIdRol() : "null"));
-            System.out.println("Direcciones: " + (usuario.getDireccionesJPA() != null ? usuario.getDireccionesJPA().size() : "null"));
 
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<Usuario> body = new HttpEntity<>(usuario);
@@ -584,25 +483,20 @@ public class UsuarioController {
             }
             );
 
-            // ✅ PASO 4: Procesar respuesta
             if (response.getBody() != null && response.getBody().correct) {
-                System.out.println("✅ Usuario registrado exitosamente");
                 redirectAttributes.addFlashAttribute("successMessage", "Usuario registrado exitosamente");
                 return "redirect:/usuario";
             } else {
                 String error = response.getBody() != null ? response.getBody().errorMessage : "Error desconocido";
-                System.out.println("❌ Error de API: " + error);
                 redirectAttributes.addFlashAttribute("errorMessage", "Error al registrar: " + error);
                 return "redirect:/usuario/formulario";
             }
 
         } catch (IOException ex) {
-            System.out.println("❌ Error procesando imagen: " + ex.getMessage());
             ex.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar la imagen: " + ex.getMessage());
             return "redirect:/usuario/formulario";
         } catch (Exception ex) {
-            System.out.println("❌ Error general: " + ex.getMessage());
             ex.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar: " + ex.getMessage());
             return "redirect:/usuario/formulario";

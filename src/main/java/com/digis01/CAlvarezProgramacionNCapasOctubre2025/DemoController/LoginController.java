@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.http.ResponseEntity;
 
 @Controller
-@RequestMapping("/")  // ← Raíz de la aplicación
+@RequestMapping("/")
 public class LoginController {
 
     public static final String urlBase = "http://localhost:8080";
@@ -26,7 +26,7 @@ public class LoginController {
         return "Login";
     }
 
-    @GetMapping  // ← Redirige desde la raíz al login
+    @GetMapping
     public String inicio() {
         return "redirect:/login";
     }
@@ -39,8 +39,6 @@ public class LoginController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            System.out.println("=== Intentando login ===");
-            System.out.println("Username: " + username);
 
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(username);
@@ -62,14 +60,11 @@ public class LoginController {
                 session.setAttribute("username", loginResponse.getUsername());
                 session.setAttribute("idUsuario", loginResponse.getIdUsuario());
                 session.setAttribute("rol", loginResponse.getRol());
-                
+
                 System.out.println(loginResponse.getToken());
-                
 
-                System.out.println("✅ Login exitoso - Token guardado en sesión");
-
-                redirectAttributes.addFlashAttribute("successMessage", "Bienvenido " + loginResponse.getUsername());
-                return "redirect:/usuario";  // ← Redirige al index de usuarios
+                redirectAttributes.addFlashAttribute("successMessage", loginResponse.getUsername());
+                return "redirect:/usuario";
 
             } else {
                 String mensaje = loginResponse != null ? loginResponse.getMensaje() : "Error desconocido";
@@ -78,9 +73,8 @@ public class LoginController {
             }
 
         } catch (Exception ex) {
-            System.out.println("❌ Error en login:");
             ex.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Error al conectar con el servidor: " + ex.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
             return "redirect:/login";
         }
     }
@@ -92,8 +86,6 @@ public class LoginController {
             String token = (String) session.getAttribute("token");
 
             if (username != null) {
-                System.out.println("LOGOUT");
-                System.out.println("Usuario: " + username);
                 System.out.println("Token " + (token != null ? "SI" : "No"));
 
             }
