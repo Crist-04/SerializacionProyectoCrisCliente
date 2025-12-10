@@ -73,7 +73,7 @@
             .btn-danger:hover {
                 background-color: #d62828;
             }
-            
+
             .status {
                 display: inline-flex;
                 align-items: center;
@@ -240,7 +240,7 @@
                     </div>
                 </div>
             </div>
- 
+
             <div class="p-3" style="max-height: 400px; overflow-y: auto;">
                 <table class="table table-hover align-middle text-center mt-2">
                     <thead>
@@ -260,7 +260,11 @@
                                         th:onclick="'window.location.href=\'/usuario/detalle/' + ${usuario.idUsuario} + '\''">
                                     <i class="bi bi-pencil-square"></i> Editar
                                 </button>
-                                <button class="btn btn-sm btn-danger" th:if="${rol == 'Administrador'}">
+                                <button class="btn btn-sm btn-danger" 
+                                        th:if="${rol == 'Administrador'}"
+                                        th:data-usuario-id="${usuario.idUsuario}"
+                                        th:data-usuario-nombre="${usuario.nombre} + ' ' + ${usuario.apellidoPaterno}"
+                                        onclick="eliminarUsuario(this)">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
                             </td>
@@ -401,6 +405,70 @@
                 }
             });
         }
+
+        function eliminarUsuario(button) {
+            const usuarioId = button.getAttribute('data-usuario-id');
+            const usuarioNombre = button.getAttribute('data-usuario-nombre');
+
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: `¿Deseas eliminar al usuario "${usuarioNombre}"? Esta acción no se puede deshacer.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Eliminando...',
+                        text: 'Por favor espera',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    fetch(`/usuario/delete/${usuarioId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.correct) {
+                                    Swal.fire({
+                                        title: '¡Eliminado!',
+                                        text: 'El usuario ha sido eliminado exitosamente.',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        // Recargar la página para actualizar la lista
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: data.errorMessage || 'No se pudo eliminar el usuario.',
+                                        icon: 'error'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Ocurrió un error al intentar eliminar el usuario.',
+                                    icon: 'error'
+                                });
+                            });
+                }
+            });
+        }
+
     </script>
 
     <script th:if="${successMessage}" th:inline="javascript">

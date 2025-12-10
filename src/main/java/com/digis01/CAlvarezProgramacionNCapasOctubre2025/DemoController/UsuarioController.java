@@ -38,6 +38,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -86,8 +87,11 @@ public class UsuarioController {
                     break;
 
                 case "usuario":
-                    usuariosFiltrados = Usuarios;
-                    System.out.println("Muestra todo" + Usuarios.size());
+                    for (Usuario u : Usuarios) {
+                        if (u.getIdUsuario() == idUsuario) {
+                            usuariosFiltrados.add(u);
+                        }
+                    }
                     break;
 
                 case "cliente":
@@ -97,6 +101,14 @@ public class UsuarioController {
                             usuariosFiltrados.add(u);
                         }
 
+                    }
+                    break;
+
+                default:
+                    for (Usuario u : Usuarios) {
+                        if (u.getIdUsuario() == idUsuario) {
+                            usuariosFiltrados.add(u);
+                        }
                     }
                     break;
             }
@@ -501,6 +513,37 @@ public class UsuarioController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar: " + ex.getMessage());
             return "redirect:/usuario/formulario";
         }
+    }
+
+    @DeleteMapping("/delete/{idUsuario}")
+    @ResponseBody
+    public Result Delete(@PathVariable("idUsuario") int idUsuario) {
+        Result result = new Result();
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/usuario/" + idUsuario,
+                    HttpMethod.DELETE,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            }
+            );
+
+            if (response.getBody() != null) {
+                result = response.getBody();
+            } else {
+                result.correct = false;
+                result.errorMessage = "No se recibió respuesta del servidor";
+            }
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = "Error al eliminar el usuario: " + ex.getMessage();
+            ex.printStackTrace();
+        }
+
+        return result;
     }
 
     @GetMapping("cargaMasiva")

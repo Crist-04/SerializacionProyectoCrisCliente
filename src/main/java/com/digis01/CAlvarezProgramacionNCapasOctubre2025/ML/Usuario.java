@@ -70,6 +70,9 @@ public class Usuario {
     
     @JsonProperty("Estatus")
     private Integer Estatus;
+    
+    @JsonProperty("IsVerified")
+    private Integer IsVerified;
 
 //    @NotNull(message = "El CURP no puede ser nulo")
 //    @NotBlank(message = "El CURP no puede estar vacío")
@@ -246,6 +249,14 @@ public void setDireccionesJPA(ArrayList<Direccion> direccionesJPA) {
     
     public void setEstatus(Integer Estatus) {
         this.Estatus = Estatus;
+    }
+
+    public Integer getIsVerified() {
+        return IsVerified;
+    }
+
+    public void setIsVerified(Integer IsVerified) {
+        this.IsVerified = IsVerified;
     }
     
     
