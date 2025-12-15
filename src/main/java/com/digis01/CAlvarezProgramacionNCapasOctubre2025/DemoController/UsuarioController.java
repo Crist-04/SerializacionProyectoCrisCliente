@@ -586,4 +586,75 @@ public class UsuarioController {
         // Inserción con carga masiva
         return "CargaMasiva";
     }
+
+    @PostMapping
+    public String BuscarUsuarios(
+            @RequestParam(required = false, defaultValue = "") String nombre,
+            @RequestParam(required = false, defaultValue = "") String apellidoPaterno,
+            @RequestParam(required = false, defaultValue = "") String apellidoMaterno,
+            @RequestParam(required = false, defaultValue = "0") int idRol,
+            Model model,
+            HttpSession session) {
+
+        String rol = (String) session.getAttribute("rol");
+        Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+
+        model.addAttribute("rol", rol);
+        model.addAttribute("idUsuario", idUsuario);
+
+        String url = urlBase + "/api/usuario/busqueda?nombre=" + nombre
+                + "&apellidoPaterno=" + apellidoPaterno
+                + "&apellidoMaterno=" + apellidoMaterno
+                + "&idRol=" + idRol;
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result<List<Usuario>>>() {
+        }
+        );
+
+        if (responseEntity.getStatusCode().value() == 200) {
+            Result result = responseEntity.getBody();
+            List<Usuario> Usuarios = (List<Usuario>) result.object;
+            List<Usuario> usuariosFiltrados = new ArrayList<>();
+
+            switch (rol.toLowerCase()) {
+                case "administrador":
+                    usuariosFiltrados = Usuarios;
+                    break;
+                case "usuario":
+                    for (Usuario u : Usuarios) {
+                        if (u.getIdUsuario() == idUsuario) {
+                            usuariosFiltrados.add(u);
+                        }
+                    }
+                    break;
+                case "cliente":
+                case "rol5":
+                    for (Usuario u : Usuarios) {
+                        if (u.getRol() != null && u.getRol().getNombre().equalsIgnoreCase(rol)) {
+                            usuariosFiltrados.add(u);
+                        }
+                    }
+                    break;
+                default:
+                    for (Usuario u : Usuarios) {
+                        if (u.getIdUsuario() == idUsuario) {
+                            usuariosFiltrados.add(u);
+                        }
+                    }
+                    break;
+            }
+
+            model.addAttribute("usuarios", usuariosFiltrados);
+        } else {
+            model.addAttribute("usuarios", new ArrayList<>());
+        }
+
+        return "UsuarioIndex";
+    }
+
 }
