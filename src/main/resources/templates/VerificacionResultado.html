@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+    <head>
+        <title>Verificación de Cuenta</title>
+
+    <th:block layout:fragment="extra-css">
+        <style>
+            main {
+                background: linear-gradient(to right, #f0f4ff, #e6edff);
+                padding: 40px 20px;
+            }
+
+            .verificacion-container {
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 50px 40px;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+                text-align: center;
+                position: relative;
+            }
+
+            .verificacion-header {
+                position: absolute;
+                top: -35px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #0d6efd, #4b8bff);
+                color: white;
+                border-radius: 50%;
+                width: 80px;
+                height: 80px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 40px;
+                box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+            }
+
+            .verificacion-header.success {
+                background: linear-gradient(135deg, #28a745, #20c997);
+            }
+
+            .verificacion-header.error {
+                background: linear-gradient(135deg, #dc3545, #e63946);
+            }
+
+            .verificacion-title {
+                font-size: 24px;
+                font-weight: 600;
+                margin-top: 30px;
+                margin-bottom: 15px;
+                color: #0d6efd;
+            }
+
+            .verificacion-title.success {
+                color: #28a745;
+            }
+
+            .verificacion-title.error {
+                color: #dc3545;
+            }
+
+            .verificacion-description {
+                font-size: 16px;
+                color: #6c757d;
+                margin-bottom: 30px;
+                line-height: 1.6;
+            }
+
+            .btn-primary {
+                background: linear-gradient(90deg, #0d6efd, #4b8bff);
+                border: none;
+                padding: 12px 40px;
+                border-radius: 10px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(90deg, #0062e6, #0053b3);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+            }
+        </style>
+    </th:block>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="verificacion-container">
+            <div th:if="${tipo == 'success'}">
+                <div class="verificacion-header success">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h2 class="verificacion-title success" th:text="${mensaje}">¡Cuenta verificada!</h2>
+                <p class="verificacion-description" th:text="${descripcion}">Tu cuenta ha sido verificada exitosamente.</p>
+                <a href="/login" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Ir al Login
+                </a>
+            </div>
+
+            <div th:if="${tipo == 'error'}">
+                <div class="verificacion-header error">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <h2 class="verificacion-title error" th:text="${mensaje}">Error en la verificación</h2>
+                <p class="verificacion-description" th:text="${descripcion}">No se pudo verificar tu cuenta.</p>
+                <a href="/" class="btn btn-primary">
+                    <i class="bi bi-house-fill me-2"></i>Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+<th:block layout:fragment="extra-scripts">
+    <script th:if="${tipo == 'success'}">
+        Swal.fire({
+            title: '¡Éxito!',
+            text: '[[${mensaje}]]',
+            icon: 'success',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    </script>
+
+    <script th:if="${tipo == 'error'}">
+        Swal.fire({
+            title: 'Error',
+            text: '[[${mensaje}]]',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
+        });
+    </script>
+</th:block>
+</body>
+</html>

@@ -546,6 +546,33 @@ public class UsuarioController {
         return result;
     }
 
+    @GetMapping("/verificar/{idUsuarioCodificado}")
+    public String VerficarCuenta(@PathVariable String idUsuarioCodificado, Model model) {
+        try {
+            String idUsuarioStr = new String(Base64.getDecoder().decode(idUsuarioCodificado));
+            int idUsuario = Integer.parseInt(idUsuarioStr);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Result> response = restTemplate.exchange(urlBase + "/api/usuario/verificar/" + idUsuario,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            });
+
+            if (response.getBody() != null && response.getBody().correct) {
+                model.addAttribute("mensaje", "Cuenta Verficada");
+                model.addAttribute("tipo", "success");
+
+            }
+
+        } catch (Exception ex) {
+            model.addAttribute("mensaje", "Error en la Verficacion");
+            model.addAttribute("tipo", "error");
+            ex.printStackTrace();
+        }
+        return "VerificacionResultado";
+    }
+
     @GetMapping("cargaMasiva")
     public String CargaMasiva() {
         return "CargaMasiva";
