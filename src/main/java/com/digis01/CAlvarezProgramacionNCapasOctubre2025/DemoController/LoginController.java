@@ -64,7 +64,18 @@ public class LoginController {
                 System.out.println(loginResponse.getToken());
 
                 redirectAttributes.addFlashAttribute("successMessage", loginResponse.getUsername());
-                return "redirect:/usuario";
+                
+                String rol = loginResponse.getRol().toUpperCase();
+                
+                if ("ADMINISTRADOR".equals(rol)) {
+                    return "redirect:/usuario";
+                }else if ("USUARIO".equals(rol) || "CLIENTE".equals(rol) || "ROL5".equals(rol)) {
+                    return "redirect:/usuario/detalle/" + loginResponse.getIdUsuario();
+                }else{
+                    return "redirect:/usuario";
+                }
+                
+                //return "redirect:/usuario";
 
             } else {
                 String mensaje = loginResponse != null ? loginResponse.getMensaje() : "Error desconocido";
