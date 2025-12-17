@@ -910,7 +910,6 @@
         }
 
         function toggleEditDireccion(index) {
-            console.log('=== Iniciando edición dirección ' + index + ' ===');
 
             const form = document.getElementById('formDireccion' + index);
             const inputs = form.querySelectorAll('.direccion-input');
@@ -945,14 +944,9 @@
             const idMunicipioActual = ddlMunicipio.data('idmunicipio');
             const idColoniaActual = ddlColonia.val();
 
-            console.log('Valores actuales:', {
-                estado: idEstadoActual,
-                municipio: idMunicipioActual,
-                colonia: idColoniaActual
-            });
+
 
             ddlPais.off('change').change(function () {
-                console.log('País cambiado');
                 const idPais = $(this).val();
 
                 if (idPais != "0") {
@@ -961,7 +955,6 @@
             });
 
             ddlEstado.off('change').change(function () {
-                console.log('Estado cambiado a:', $(this).val());
                 const idEstado = $(this).val();
 
                 if (idEstado != "0") {
@@ -970,7 +963,6 @@
                         url: "/usuario/municipio/" + idEstado,
                         datatype: "json",
                         success: function (data) {
-                            console.log('✅ Municipios recibidos:', data);
                             ddlMunicipio.empty();
                             ddlMunicipio.append("<option value='0'>Selecciona un municipio</option>");
 
@@ -986,7 +978,6 @@
                             codigoPostal.val("");
                         },
                         error: function (xhr, status, error) {
-                            console.error(' Error cargando municipios:', error);
                             Swal.fire('Error', 'No se pudieron cargar los municipios', 'error');
                         }
                     });
@@ -998,7 +989,6 @@
             });
 
             ddlMunicipio.off('change').change(function () {
-                console.log('Municipio cambiado a:', $(this).val());
                 const idMunicipio = $(this).val();
 
                 if (idMunicipio != "0") {
@@ -1022,7 +1012,6 @@
                             codigoPostal.val("");
                         },
                         error: function (xhr, status, error) {
-                            console.error(' Error cargando colonias:', error);
                             Swal.fire('Error', 'No se pudieron cargar las colonias', 'error');
                         }
                     });
@@ -1048,9 +1037,7 @@
                                 codigoPostal.val(cp);
                             }
                         },
-                        error: function (xhr) {
-                            console.error(' Error cargando código postal');
-                        }
+
                     });
                 } else {
                     codigoPostal.val("");
@@ -1066,14 +1053,12 @@
             const ddlMunicipio = $("#ddlmunicipio" + index);
             const ddlColonia = $("#ddlcolonia" + index);
 
-            console.log('Cargando estados...');
 
             $.ajax({
                 type: 'GET',
                 url: "/usuario/estado/1",
                 datatype: "json",
                 success: function (data) {
-                    console.log('✅ Estados recibidos:', data);
                     ddlEstado.empty();
                     ddlEstado.append("<option value='0'>Selecciona un estado</option>");
 
@@ -1092,7 +1077,6 @@
                                 url: "/usuario/municipio/" + idEstadoActual,
                                 datatype: "json",
                                 success: function (data) {
-                                    console.log('✅ Municipios iniciales recibidos:', data);
                                     ddlMunicipio.empty();
                                     ddlMunicipio.append("<option value='0'>Selecciona un municipio</option>");
 
@@ -1111,7 +1095,6 @@
                                                 url: "/usuario/colonia/" + idMunicipioActual,
                                                 datatype: "json",
                                                 success: function (data) {
-                                                    console.log('✅ Colonias iniciales recibidas:', data);
                                                     ddlColonia.empty();
                                                     ddlColonia.append("<option value='0'>Selecciona una colonia</option>");
 
@@ -1136,7 +1119,6 @@
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error('❌ Error cargando estados:', error);
                     Swal.fire('Error', 'No se pudieron cargar los estados', 'error');
                 }
             });
@@ -1192,14 +1174,12 @@
         function configurarEventosModal() {
             $("#modalEstado").off('change').change(function () {
                 const idEstado = $(this).val();
-                console.log('Modal - Estado seleccionado:', idEstado);
 
                 if (idEstado != "0") {
                     $.ajax({
                         type: 'GET',
                         url: "/usuario/municipio/" + idEstado,
                         success: function (data) {
-                            console.log('Modal - Municipios recibidos:', data);
                             const ddlMunicipio = $('#modalMunicipio');
                             ddlMunicipio.empty().append("<option value='0'>Selecciona un municipio</option>");
 
@@ -1215,7 +1195,6 @@
                             $('#modalCodigoPostal').val("");
                         },
                         error: function (xhr) {
-                            console.error('Modal - Error cargando municipios');
                             Swal.fire('Error', 'No se pudieron cargar los municipios', 'error');
                         }
                     });
@@ -1228,14 +1207,12 @@
 
             $("#modalMunicipio").off('change').change(function () {
                 const idMunicipio = $(this).val();
-                console.log('Modal - Municipio seleccionado:', idMunicipio);
 
                 if (idMunicipio != "0") {
                     $.ajax({
                         type: 'GET',
                         url: "/usuario/colonia/" + idMunicipio,
                         success: function (data) {
-                            console.log('Modal - Colonias recibidas:', data);
 
                             const ddlColonia = $('#modalColonia');
                             ddlColonia.empty().append("<option value='0'>Selecciona una colonia</option>");
@@ -1251,9 +1228,6 @@
                             }
 
                             $('#modalCodigoPostal').val("");
-                        },
-                        error: function () {
-                            console.error('Modal - Error cargando colonias');
                         }
                     });
                 } else {
@@ -1264,16 +1238,13 @@
 
             $("#modalColonia").off('change').change(function () {
                 const idColonia = parseInt($(this).val());
-                console.log("Modal - Colonia seleccionada:", idColonia);
 
                 if (!window.coloniasCargadas) {
-                    console.error("❌ No hay colonias cargadas aún");
                     return;
                 }
 
                 const coloniaSeleccionada = window.coloniasCargadas.find(c => c.idColonia == idColonia);
 
-                console.log("Colonia encontrada:", coloniaSeleccionada);
 
                 if (coloniaSeleccionada) {
                     $('#modalCodigoPostal').val(coloniaSeleccionada.codigoPostal);
@@ -1289,7 +1260,6 @@
                 type: 'GET',
                 url: "/usuario/estado/1",
                 success: function (data) {
-                    console.log('Modal - Estados recibidos:', data);
                     $("#modalEstado").empty().append("<option value='0'>Selecciona un estado</option>");
 
                     if (data.object) {
@@ -1302,20 +1272,17 @@
                     $("#modalEstado").val(idEstado)
                 },
                 error: function (xhr) {
-                    console.error('Modal - Error cargando estados');
                     Swal.fire('Error', 'No se pudieron cargar los estados', 'error');
                 }
             });
         }
 
         function cargarMunicipiosModal(idEstado, idMunicipio) {
-            console.log('Cargando municipios en modal...');
 
             $.ajax({
                 type: 'GET',
                 url: "/usuario/municipio/" + idEstado,
                 success: function (data) {
-                    console.log('Modal - Municipios recibidos:', data);
 
                     $("#modalMunicipio").empty().append("<option value='0'>Selecciona un municipio</option>");
 
@@ -1330,20 +1297,17 @@
                     $("#modalMunicipio").val(idMunicipio);
                 },
                 error: function (xhr) {
-                    console.error('Modal - Error cargando municipios');
                     Swal.fire('Error', 'No se pudieron cargar los municipios', 'error');
                 }
             });
         }
 
         function cargarColoniasModal(idMunicipio, idColonia) {
-            console.log('Cargando colonias en modal...');
 
             $.ajax({
                 type: 'GET',
                 url: "/usuario/colonia/" + idMunicipio,
                 success: function (data) {
-                    console.log('Modal - Colonias recibidas:', data);
 
                     $("#modalColonia").empty().append("<option value='0'>Selecciona una colonia</option>");
 
@@ -1360,7 +1324,6 @@
                     $("#modalColonia").val(idColonia);
                 },
                 error: function (xhr) {
-                    console.error('Modal - Error cargando colonias');
                     Swal.fire('Error', 'No se pudieron cargar las colonias', 'error');
                 }
             });
@@ -1416,7 +1379,6 @@
                                 .then(() => location.reload());
                     },
                     error: function (xhr) {
-                        console.error('Error:', xhr);
                         Swal.fire("Error", "No se pudo agregar la dirección", "error");
                     }
                 });

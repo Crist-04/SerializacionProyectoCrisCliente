@@ -5,10 +5,8 @@
     <head>
         <title>Formulario de Usuario</title>
 
-        <!-- Estilos específicos de esta página -->
     <th:block layout:fragment="extra-css">
         <style>
-            /* Ajuste para el contenedor principal */
             main {
                 background: linear-gradient(to right, #f0f4ff, #e6edff);
                 padding: 40px 20px;
@@ -336,10 +334,8 @@
         </div>
     </div>
 
-    <!-- Scripts específicos de esta página -->
 <th:block layout:fragment="extra-scripts">
     <script>
-        // Función auxiliar para obtener propiedades (maneja diferentes formatos de respuesta)
         function getPropertyValue(obj, propName) {
             return obj[propName] || obj[propName.charAt(0).toUpperCase() + propName.slice(1)];
         }
@@ -347,10 +343,8 @@
         $(document).ready(function () {
             console.log("Scripts cargados correctamente");
 
-            // Cargar estados al seleccionar país
             $("#ddlpais").change(function () {
                 const idPais = $(this).val();
-                console.log("País seleccionado:", idPais);
 
                 if (idPais != "0") {
                     $.ajax({
@@ -358,11 +352,9 @@
                         url: "/usuario/estado/" + idPais,
                         datatype: "json",
                         success: function (data) {
-                            console.log("Estados recibidos:", data);
                             $("#ddlestado").empty();
                             $("#ddlestado").append("<option value='0' selected>Selecciona un estado</option>");
 
-                            // Manejar tanto data.objects como data.object
                             const estados = data.objects || data.object || [];
                             $.each(estados, function (i, estado) {
                                 const idEstado = getPropertyValue(estado, 'idEstado');
@@ -370,23 +362,19 @@
                                 $("#ddlestado").append("<option value='" + idEstado + "'>" + nombre + "</option>");
                             });
 
-                            // Limpiar municipios y colonias
                             $("#ddlmunicipio").empty().append("<option value='0'>Selecciona un municipio</option>");
                             $("#ddlcolonia").empty().append("<option value='0'>Selecciona una colonia</option>");
                             $("#codigoPostal").val("");
                         },
                         error: function (xhr, status, error) {
-                            console.error("Error cargando estados:", error);
                             alert("No se pudieron cargar los estados");
                         }
                     });
                 }
             });
 
-            // Cargar municipios al seleccionar estado
             $("#ddlestado").change(function () {
                 const idEstado = $(this).val();
-                console.log("Estado seleccionado:", idEstado);
 
                 if (idEstado != "0") {
                     $.ajax({
@@ -394,7 +382,6 @@
                         url: "/usuario/municipio/" + idEstado,
                         datatype: "json",
                         success: function (data) {
-                            console.log("Municipios recibidos:", data);
                             $("#ddlmunicipio").empty();
                             $("#ddlmunicipio").append("<option value='0' selected>Selecciona un municipio</option>");
 
@@ -405,22 +392,18 @@
                                 $("#ddlmunicipio").append("<option value='" + idMunicipio + "'>" + nombre + "</option>");
                             });
 
-                            // Limpiar colonias
                             $("#ddlcolonia").empty().append("<option value='0'>Selecciona una colonia</option>");
                             $("#codigoPostal").val("");
                         },
                         error: function (xhr, status, error) {
-                            console.error("Error cargando municipios:", error);
                             alert("No se pudieron cargar los municipios");
                         }
                     });
                 }
             });
 
-            // Cargar colonias al seleccionar municipio
             $("#ddlmunicipio").change(function () {
                 const idMunicipio = $(this).val();
-                console.log("Municipio seleccionado:", idMunicipio);
 
                 if (idMunicipio != "0") {
                     $.ajax({
@@ -428,12 +411,10 @@
                         url: "/usuario/colonia/" + idMunicipio,
                         datatype: "json",
                         success: function (data) {
-                            console.log("Colonias recibidas:", data);
                             $("#ddlcolonia").empty();
                             $("#ddlcolonia").append("<option value='0' selected>Selecciona una Colonia</option>");
 
                             const colonias = data.objects || data.object || [];
-                            // Guardar colonias para acceder al código postal
                             window.coloniasCargadas = colonias;
 
                             $.each(colonias, function (i, colonia) {
@@ -445,26 +426,21 @@
                             $("#codigoPostal").val("");
                         },
                         error: function (xhr, status, error) {
-                            console.error("Error cargando colonias:", error);
                             alert("No se pudieron cargar las colonias");
                         }
                     });
                 }
             });
 
-            // Cargar código postal al seleccionar colonia
             $("#ddlcolonia").change(function () {
                 const idColonia = parseInt($(this).val());
-                console.log("Colonia seleccionada:", idColonia);
 
                 if (idColonia != "0" && window.coloniasCargadas) {
-                    // Buscar la colonia en los datos cargados
                     const coloniaSeleccionada = window.coloniasCargadas.find(c => {
                         const id = getPropertyValue(c, 'idColonia');
                         return id == idColonia;
                     });
 
-                    console.log("Colonia encontrada:", coloniaSeleccionada);
 
                     if (coloniaSeleccionada) {
                         const cp = getPropertyValue(coloniaSeleccionada, 'codigoPostal');
@@ -477,7 +453,6 @@
                 }
             });
 
-            // Validación de fecha
             let hoy = new Date().toISOString().split('T')[0];
             $("#fechaNacimiento").attr('max', hoy);
         });
