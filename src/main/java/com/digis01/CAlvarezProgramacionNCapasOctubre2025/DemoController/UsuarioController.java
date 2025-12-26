@@ -546,33 +546,32 @@ public class UsuarioController {
         return result;
     }
 
-    @GetMapping("/verificar/{idUsuarioCodificado}")
-    public String VerficarCuenta(@PathVariable String idUsuarioCodificado, Model model) {
-        try {
-            String idUsuarioStr = new String(Base64.getDecoder().decode(idUsuarioCodificado));
-            int idUsuario = Integer.parseInt(idUsuarioStr);
-
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<Result> response = restTemplate.exchange(urlBase + "/api/usuario/verificar/" + idUsuario,
-                    HttpMethod.GET,
-                    HttpEntity.EMPTY,
-                    new ParameterizedTypeReference<Result>() {
-            });
-
-            if (response.getBody() != null && response.getBody().correct) {
-                model.addAttribute("mensaje", "Cuenta Verficada");
-                model.addAttribute("tipo", "success");
-
-            }
-
-        } catch (Exception ex) {
-            model.addAttribute("mensaje", "Error en la Verficacion");
-            model.addAttribute("tipo", "error");
-            ex.printStackTrace();
-        }
-        return "VerificacionResultado";
-    }
-
+//    @GetMapping("/verificar/{idUsuarioCodificado}")
+//    public String VerficarCuenta(@PathVariable String idUsuarioCodificado, Model model) {
+//        try {
+//            String idUsuarioStr = new String(Base64.getDecoder().decode(idUsuarioCodificado));
+//            int idUsuario = Integer.parseInt(idUsuarioStr);
+//
+//            RestTemplate restTemplate = new RestTemplate();
+//            ResponseEntity<Result> response = restTemplate.exchange(urlBase + "/api/usuario/verificar/" + idUsuario,
+//                    HttpMethod.GET,
+//                    HttpEntity.EMPTY,
+//                    new ParameterizedTypeReference<Result>() {
+//            });
+//
+//            if (response.getBody() != null && response.getBody().correct) {
+//                model.addAttribute("mensaje", "Cuenta Verficada");
+//                model.addAttribute("tipo", "success");
+//
+//            }
+//
+//        } catch (Exception ex) {
+//            model.addAttribute("mensaje", "Error en la Verficacion");
+//            model.addAttribute("tipo", "error");
+//            ex.printStackTrace();
+//        }
+//        return "VerificacionResultado";
+//    }
     @GetMapping("cargaMasiva")
     public String CargaMasiva() {
         return "CargaMasiva";
@@ -655,6 +654,40 @@ public class UsuarioController {
         }
 
         return "UsuarioIndex";
+    }
+
+    @GetMapping("/verificar/{token}")
+    public String VerificarCuenta(@PathVariable String token, Model model) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result> response = restTemplate.exchange(
+                    urlBase + "/api/usuario/verificar/token/" + token,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result>() {
+            }
+            );
+
+            if (response.getBody() != null && response.getBody().correct) {
+                model.addAttribute("mensaje", "Cuenta verificada exitosamente");
+                model.addAttribute("tipo", "success");
+                model.addAttribute("descripcion", "Tu cuenta ha sido verificada.");
+            } else {
+                String error = response.getBody() != null ? response.getBody().errorMessage : "Error";
+                model.addAttribute("mensaje", "Error en la verificación");
+                model.addAttribute("tipo", "error");
+                model.addAttribute("descripcion", error);
+            }
+
+        } catch (Exception ex) {
+            model.addAttribute("mensaje", "Error al procesar la verificación");
+            model.addAttribute("tipo", "error");
+            model.addAttribute("descripcion", "Ocurrió un error al verificar tu cuenta.");
+            ex.printStackTrace();
+        }
+
+        return "VerificacionResultado";
     }
 
 }
